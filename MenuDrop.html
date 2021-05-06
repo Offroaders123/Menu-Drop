@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+
+<title>MenuDrop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  margin: 0;
+  padding: 0 24px;
+}
+</style>
+
+<template id="menu_styles">
+
+<style>
+:host(menu-drop), *, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:host(menu-drop) {
+  position: relative;
+  display: inline-block;
+  font-size: 13px;
+  font-family: sans-serif;/*font-family: system-ui;*/
+  white-space: pre;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+}
+[part="container"] {
+  display: flex;
+  flex-direction: column;
+}
+[part="opener"] {background: #bbb;border: none;border-radius: 4px;
+  padding: 4px 8px;
+  font-size: inherit;
+  font-family: inherit;
+}
+[part="list"] {background: #dddddd;
+  padding: 8px 8px;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  list-style: none;
+  border: 1px solid #00000040;
+  border-radius: 6px;
+  box-shadow: 0 5px 10px #00000060;
+  visibility: hidden;
+  opacity: 0;
+  /*transition: 100ms linear;*/
+  transition-property: visibility, opacity;
+}
+:host(menu-drop[active]) [part="container"] > [part="list"] {/*background: red;*/
+  visibility: visible;
+  opacity: 1;
+  transition-duration: 0ms;
+}
+[part="list-item"] {
+  padding: 4px 8px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  border-radius: 4px;
+}
+[part="list-item"]:-webkit-any(:hover,:focus-visible) {
+  color: #eeeeee;
+  background: #0763d5;
+}
+[part="shortcut"] {
+  margin-left: auto;
+  opacity: 0.6;
+  pointer-events: none;
+}
+[part="list-item"]:-webkit-any(:hover,:focus-visible) [part="shortcut"] {
+  opacity: 1;
+}
+[part="sub-list-container"] {
+  position: relative;
+}
+[part="divider"] {
+  margin: 4px 12px;
+  border: none;
+  border-top: 1px solid currentColor;
+  opacity: 0.6;
+}
+[part="sub-list-container"] [part="list"] {
+  left: calc(100% - 0px);
+  top: -9px;
+}
+[part="sub-list-container"][active] > [part="list"] {
+  visibility: visible;
+  opacity: 1;
+  transition-duration: 0ms;
+}
+[part="sub-list-container"] > [part="list-item"]::after {
+  content: "";
+  margin-left: auto;
+  border: 5px solid transparent;
+  border-left-width: 6px;
+  border-left-color: currentColor;
+  border-right: none;
+  opacity: 0.6;
+}
+[part="sub-list-container"] > [part="list-item"]:-webkit-any(:hover,:focus-visible)::after {
+  opacity: 1;
+}
+[part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within) {
+  background: #bbbbbb;
+}
+[part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within)::after {
+  opacity: 1;
+}
+</style>
+
+</template>
+
+<style>
+pre {
+  display: flex;
+}
+#source {
+  margin-top: 130px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>MenuDrop</h1>
+
+<nav>
+
+<menu-drop>
+{
+  "type": "opener",
+  "label": "JSON-based menu"
+},
+{
+  "type": "list",
+  "content": [
+    {
+      "type": "list",
+      "label": "A nice submenu",
+      "content": [
+        {
+          "type": "list-item",
+          "label": "JSON is cool",
+          "shortcuts": {
+            "default": "Ctrl + Shift + 1"
+          }
+        },
+        {
+          "type": "list-item",
+          "label": "woah fancy"
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "label": "noice list"
+    },
+    {
+      "type": "list-item",
+      "label": "Option 2",
+      "shortcuts": {
+        "default": "Ctrl + Shift + 2"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "list",
+      "label": "dropdowndropdown",
+      "content": [
+        {
+          "type": "list-item",
+          "label": "gibberish words"
+        },
+        {
+          "type": "list-item",
+          "label": "content to help test things"
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "label": "Really long name for testing"
+    },
+    {
+      "type": "list-item",
+      "label": "Better responsiveness!"
+    }
+  ]
+}
+</menu-drop>
+
+<button>Test content</button>
+
+</nav>
+
+<textarea id="textarea"></textarea>
+<button>Another element for testing z-index</button>
+
+<pre>
+  <code id="source"></code>
+</pre>
+
+<script>//console.clear();
+class MenuDrop extends HTMLElement {
+  constructor(){
+    super();
+    this.attachShadow({ mode: "open" });
+  }
+  connectedCallback(){
+    this.styles = document.createElement("style");
+    this.styles.textContent = menu_styles.content.querySelector("style").textContent;
+    this.container = document.createElement("div");
+    this.container.part = "container";
+
+    this.layout = JSON.parse(`[${this.textContent}]`);
+
+    this.opener = document.createElement("button");
+    this.opener.part = "opener";
+    this.opener.textContent = this.layout.find(element => (element.type == "opener")).label || "";
+    this.opener.addEventListener("click",() => {
+      (!this.active) ? this.open() : this.close();
+    });
+
+    this.list = document.createElement("ul");
+    this.list.part = "list";
+    this.list.addEventListener("mouseover",event => {
+      if (!event.target.matches("[part='list-item']")) return;
+      this.list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
+        itemContainer.removeAttribute("active");
+      });
+      if (!event.target.matches("[part='sub-list-container'] > [part='list-item']")) return;
+      //source.innerHTML = Math.random();
+      event.target.parentElement.setAttribute("active",true);
+    });
+    this.list.addEventListener("mouseout",event => {
+      if (event.target == this.list) return;
+      //source.textContent = event.target.cloneNode().outerHTML.split("><").join(`>${event.target.childNodes[0].textContent}<`);
+      this.list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
+        itemContainer.removeAttribute("active");
+      });
+    });
+    this.list.addEventListener("click",event => {
+      if (event.target.matches("[part='list'] > [part='list-item']")) this.close();
+      if (event.target.matches("[part='sub-list-container'] > [part='list-item']")){
+        var subListContainer = event.target.closest("[part='sub-list-container']");
+        (!subListContainer.hasAttribute("active")) ? subListContainer.setAttribute("active",true) : subListContainer.removeAttribute("active");
+      }
+    });
+
+    this.shadowRoot.appendChild(this.container);
+    this.container.appendChild(this.styles);
+
+    this.container.appendChild(this.opener);
+    this.container.appendChild(this.list);
+
+    this.layout.find(element => (element.type == "list")).content.forEach(element => {
+      if (element.type == "divider"){
+        var divider = document.createElement("hr");
+        divider.part = "divider";
+        this.list.appendChild(divider);
+        return;
+      }
+      var itemContainer;
+      if (element.type == "list"){
+        itemContainer = document.createElement("div");
+        itemContainer.part = "sub-list-container";
+        if (element.active) itemContainer.setAttribute("active",true);
+      }
+      var listItem = document.createElement("li");
+      listItem.part = "list-item";
+      listItem.tabIndex = 0;
+      listItem.textContent = element.label;
+      if (element.shortcuts && !itemContainer){
+        var shortcut = document.createElement("span");
+        shortcut.part = "shortcut";
+        shortcut.textContent = element.shortcuts.default;
+        listItem.appendChild(shortcut);
+      }
+      var subList = document.createElement("ul");
+      subList.part = "list";
+
+
+      if (itemContainer){
+        subList.addEventListener("mouseover",event => {
+          event.stopPropagation();
+        });
+        itemContainer.addEventListener("mouseout",event => {
+          event.stopPropagation();
+        });
+        itemContainer.appendChild(listItem);
+        this.list.appendChild(itemContainer);
+        itemContainer.appendChild(subList);
+      } else {
+        this.list.appendChild(listItem);
+      }
+
+
+      if (element.type != "list") return;
+      element.content.forEach(element => {
+        var subListItem = document.createElement("li");
+        subListItem.part = "list-item";
+        subListItem.tabIndex = 0;
+        subListItem.textContent = element.label;
+        if (element.shortcuts){
+          var shortcut = document.createElement("span");
+          shortcut.part = "shortcut";
+          shortcut.textContent = element.shortcuts.default;
+          subListItem.appendChild(shortcut);
+        }
+        subList.appendChild(subListItem);
+      });
+    });
+
+    var openerWidth = window.getComputedStyle(this.opener).getPropertyValue("width"),
+      listWidth = window.getComputedStyle(this.list).getPropertyValue("width");
+    // For <select>-like styling //if (openerWidth < listWidth) this.opener.style.width = listWidth;
+    if (openerWidth > listWidth) this.list.style.width = openerWidth;
+
+    //this.container.innerHTML += JSON.stringify(this.layout,null,"  ");
+    //textarea.value = this.container.outerHTML;
+    //source.textContent = this.list.outerHTML.split("><").join(">\n<");
+  }
+  get active(){
+    return this.hasAttribute("active");
+  }
+  open(){
+    this.setAttribute("active",true);
+  }
+  close(){
+    this.removeAttribute("active");
+    this.container.querySelectorAll("[part='sub-list-container'][active]").forEach(subList => subList.removeAttribute("active"));
+  }
+}
+window.customElements.define("menu-drop",MenuDrop);
+
+window.addEventListener("click",() => {
+  if (event.target.closest("menu-drop")) return;
+  document.querySelectorAll("menu-drop[active]").forEach(menuDrop => {
+    menuDrop.close();
+  });
+});
+
+window.addEventListener("blur",() => {
+  document.querySelectorAll("menu-drop[active]").forEach(menuDrop => {
+    menuDrop.close();
+  });
+});
+</script>
+
+<script>
+
+</script>
+
+</body>
+
+</html>
