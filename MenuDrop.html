@@ -11,6 +11,8 @@
 body {
   margin: 0;
   padding: 0 24px;
+  color: #ffffff;
+  background: url("https://www.lefthudson.com/wp-content/uploads/2019/11/sedona-wallpaper-awesome-gallery-sedona-real-inn-amp-suites-ideas-of-sedona-wallpaper.png") no-repeat center;
 }
 </style>
 
@@ -25,8 +27,9 @@ body {
 :host(menu-drop) {
   position: relative;
   display: inline-block;
+  color: #000000;
   font-size: 13px;
-  font-family: sans-serif;/*font-family: system-ui;*/
+  font-family: system-ui;font-family: sans-serif;
   white-space: pre;
   user-select: none;
   -webkit-user-select: none;
@@ -36,26 +39,47 @@ body {
   display: flex;
   flex-direction: column;
 }
-[part="opener"] {background: #bbb;border: none;border-radius: 4px;
+[part="opener"] {
   padding: 4px 8px;
   font-size: inherit;
   font-family: inherit;
+  background: #bbbbbb;
+  border: none;
+  border-radius: 4px;
 }
-[part="list"] {background: #dddddd;
+[part="list"] {
   padding: 8px 8px;
-  position: absolute;
-  left: 0;
-  top: 100%;
+  position: fixed;
+  left: var(--list-offset-x,0px);
+  top: var(--list-offset-y,0px);
   list-style: none;
-  border: 1px solid #00000040;
+  --list-background: #ffffff80;
+  --list-border-width: 1px;
+  --list-border-color: #00000040;
+  border: var(--list-border-width) solid transparent;
   border-radius: 6px;
   box-shadow: 0 5px 10px #00000060;
   visibility: hidden;
   opacity: 0;
-  /*transition: 100ms linear;*/
+  z-index: 1;
+  transition: 100ms linear;
   transition-property: visibility, opacity;
 }
-:host(menu-drop[active]) [part="container"] > [part="list"] {/*background: red;*/
+[part="list"]::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--list-border-width) * -1);
+  right: calc(var(--list-border-width) * -1);
+  top: calc(var(--list-border-width) * -1);
+  bottom: calc(var(--list-border-width) * -1);
+  background: var(--list-background);
+  backdrop-filter: blur(40px);
+  border: var(--list-border-width) solid var(--list-border-color);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+}
+:host(menu-drop[active]) [part="container"] > [part="list"] {
   visibility: visible;
   opacity: 1;
   transition-duration: 0ms;
@@ -83,14 +107,14 @@ body {
   position: relative;
 }
 [part="divider"] {
-  margin: 4px 12px;
+  margin: 6px 12px;
   border: none;
   border-top: 1px solid currentColor;
   opacity: 0.6;
 }
 [part="sub-list-container"] [part="list"] {
-  left: calc(100% - 0px);
-  top: -9px;
+  left: calc(var(--list-offset-x,0px) - 0px);
+  top: calc(var(--list-offset-y,0px) - 9px);
 }
 [part="sub-list-container"][active] > [part="list"] {
   visibility: visible;
@@ -110,7 +134,8 @@ body {
   opacity: 1;
 }
 [part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within) {
-  background: #bbbbbb;
+  --sub-list-item-active-background: #00000030;
+  background: var(--sub-list-item-active-background);
 }
 [part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within)::after {
   opacity: 1;
@@ -120,11 +145,25 @@ body {
 </template>
 
 <style>
+:root.dark-mode menu-drop {
+  color: #dddddd;
+}
+:root.dark-mode menu-drop::part(list) {
+  --list-background: #24242490;
+  --list-border-color: #ffffff30;
+}
+:root.dark-mode menu-drop::part(list-item) {
+  --sub-list-item-active-background: #ffffff20;
+}
+</style>
+
+<style>
 pre {
   display: flex;
 }
 #source {
   margin-top: 130px;
+  background: #ffffff;
 }
 </style>
 
@@ -180,6 +219,56 @@ pre {
       "label": "dropdowndropdown",
       "content": [
         {
+          "type": "list",
+          "label": "dropdowndropdown",
+          "content": [
+            {
+              "type": "list-item",
+              "label": "goes on for a long time"
+            },
+            {
+              "type": "list",
+              "label": "dropdowndropdown",
+              "content": [
+                {
+                  "type": "list-item",
+                  "label": "goes on for a long time"
+                },
+                {
+                  "type": "list",
+                  "label": "dropdowndropdown",
+                  "content": [
+                    {
+                      "type": "list-item",
+                      "label": "goes on for a long time"
+                    },
+                    {
+                      "type": "list",
+                      "label": "dropdowndropdown",
+                      "content": [
+                        {
+                          "type": "list-item",
+                          "label": "goes on for a long time"
+                        },
+                        {
+                          "type": "list",
+                          "label": "dropdowndropdown",
+                          "content": [
+                            {
+                              "type": "list-item",
+                              "label": "goes on for a long time"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "type": "list-item",
           "label": "gibberish words"
         },
@@ -202,6 +291,7 @@ pre {
 </menu-drop>
 
 <button>Test content</button>
+<button onclick="toggleDark();">Toggle Dark Mode</button>
 
 </nav>
 
@@ -235,22 +325,8 @@ class MenuDrop extends HTMLElement {
 
     this.list = document.createElement("ul");
     this.list.part = "list";
-    this.list.addEventListener("mouseover",event => {
-      if (!event.target.matches("[part='list-item']")) return;
-      this.list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
-        itemContainer.removeAttribute("active");
-      });
-      if (!event.target.matches("[part='sub-list-container'] > [part='list-item']")) return;
-      //source.innerHTML = Math.random();
-      event.target.parentElement.setAttribute("active",true);
-    });
-    this.list.addEventListener("mouseout",event => {
-      if (event.target == this.list) return;
-      //source.textContent = event.target.cloneNode().outerHTML.split("><").join(`>${event.target.childNodes[0].textContent}<`);
-      this.list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
-        itemContainer.removeAttribute("active");
-      });
-    });
+    this.list.setAttribute("content",JSON.stringify(this.layout.find(element => (element.type == "list")).content));
+
     this.list.addEventListener("click",event => {
       if (event.target.matches("[part='list'] > [part='list-item']")) this.close();
       if (event.target.matches("[part='sub-list-container'] > [part='list-item']")){
@@ -265,11 +341,43 @@ class MenuDrop extends HTMLElement {
     this.container.appendChild(this.opener);
     this.container.appendChild(this.list);
 
-    this.layout.find(element => (element.type == "list")).content.forEach(element => {
+    this.moveList(this.list);
+    this.build_list(this.list);
+
+    var openerWidth = window.getComputedStyle(this.opener).getPropertyValue("width"),
+      listWidth = window.getComputedStyle(this.list).getPropertyValue("width");
+    // For <select>-like styling //if (openerWidth < listWidth) this.opener.style.width = listWidth;
+    if (openerWidth > listWidth) this.list.style.width = openerWidth;
+
+    //this.container.innerHTML += JSON.stringify(this.layout,null,"  ");
+    //textarea.value = this.container.outerHTML;
+    //this.container.querySelectorAll("[content]").forEach(element => element.removeAttribute("content"));
+    //source.textContent = this.list.outerHTML.split("><").join(">\n<");
+  }
+  build_list(list){
+    var content = JSON.parse(list.getAttribute("content"));
+    list.addEventListener("mouseover",event => {
+      if (!event.target.matches("[part='list-item']")) return;
+      list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
+        itemContainer.removeAttribute("active");
+      });
+      if (!event.target.matches("[part='sub-list-container'] > [part='list-item']")) return;
+      event.target.parentElement.setAttribute("active",true);
+      this.moveList(event.target.parentElement.querySelector("[part='list']"));
+    });
+    list.addEventListener("mouseout",event => {
+      if (event.target == list) return;
+      //source.textContent = event.target.cloneNode().outerHTML.split("><").join(`>${event.target.childNodes[0].textContent}<`);
+      list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
+        itemContainer.removeAttribute("active");
+      });
+    });
+
+    content.forEach(element => {
       if (element.type == "divider"){
         var divider = document.createElement("hr");
         divider.part = "divider";
-        this.list.appendChild(divider);
+        list.appendChild(divider);
         return;
       }
       var itemContainer;
@@ -300,43 +408,34 @@ class MenuDrop extends HTMLElement {
           event.stopPropagation();
         });
         itemContainer.appendChild(listItem);
-        this.list.appendChild(itemContainer);
+        list.appendChild(itemContainer);
         itemContainer.appendChild(subList);
+        window.setTimeout(() => this.moveList(subList));
       } else {
-        this.list.appendChild(listItem);
+        list.appendChild(listItem);
       }
 
 
       if (element.type != "list") return;
-      element.content.forEach(element => {
-        var subListItem = document.createElement("li");
-        subListItem.part = "list-item";
-        subListItem.tabIndex = 0;
-        subListItem.textContent = element.label;
-        if (element.shortcuts){
-          var shortcut = document.createElement("span");
-          shortcut.part = "shortcut";
-          shortcut.textContent = element.shortcuts.default;
-          subListItem.appendChild(shortcut);
-        }
-        subList.appendChild(subListItem);
-      });
+      subList.setAttribute("content",JSON.stringify(element.content));
+      this.build_list(subList);
     });
-
-    var openerWidth = window.getComputedStyle(this.opener).getPropertyValue("width"),
-      listWidth = window.getComputedStyle(this.list).getPropertyValue("width");
-    // For <select>-like styling //if (openerWidth < listWidth) this.opener.style.width = listWidth;
-    if (openerWidth > listWidth) this.list.style.width = openerWidth;
-
-    //this.container.innerHTML += JSON.stringify(this.layout,null,"  ");
-    //textarea.value = this.container.outerHTML;
-    //source.textContent = this.list.outerHTML.split("><").join(">\n<");
+  }
+  moveList(list){
+    if (list == this.list){
+      this.list.style.setProperty("--list-offset-x",`${this.opener.getBoundingClientRect().left}px`);
+      this.list.style.setProperty("--list-offset-y",`${this.opener.getBoundingClientRect().bottom}px`);
+    } else {
+      list.style.setProperty("--list-offset-x",`${list.parentElement.getBoundingClientRect().right}px`);
+      list.style.setProperty("--list-offset-y",`${list.parentElement.getBoundingClientRect().top}px`);
+    }
   }
   get active(){
     return this.hasAttribute("active");
   }
   open(){
     this.setAttribute("active",true);
+    this.moveList(this.list);
   }
   close(){
     this.removeAttribute("active");
@@ -360,7 +459,10 @@ window.addEventListener("blur",() => {
 </script>
 
 <script>
-
+  //toggleDark();
+  function toggleDark(){
+    document.documentElement.classList.toggle("dark-mode");
+  }
 </script>
 
 </body>
