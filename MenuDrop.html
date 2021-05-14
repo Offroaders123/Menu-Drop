@@ -49,9 +49,9 @@ body {
 }
 [part="list"] {
   padding: 8px 8px;
-  position: fixed;
-  left: var(--list-offset-x,0px);
-  top: var(--list-offset-y,0px);
+  position: absolute;
+  left: 0;
+  top: 100%;
   list-style: none;
   --list-background: #ffffff80;
   --list-border-width: 1px;
@@ -113,8 +113,8 @@ body {
   opacity: 0.6;
 }
 [part="sub-list-container"] [part="list"] {
-  left: calc(var(--list-offset-x,0px) - 0px);
-  top: calc(var(--list-offset-y,0px) - 9px);
+  left: calc(100% - var(--list-horizontal-offset,0px));
+  top: -9px;
 }
 [part="sub-list-container"][active] > [part="list"] {
   visibility: visible;
@@ -145,6 +145,7 @@ body {
 </template>
 
 <style>
+/* Dark Mode testing styles */
 :root.dark-mode menu-drop {
   color: #dddddd;
 }
@@ -154,6 +155,18 @@ body {
 }
 :root.dark-mode menu-drop::part(list-item) {
   --sub-list-item-active-background: #ffffff20;
+}
+
+/* Windows theme testing styles */
+:root.windows menu-drop::part(list) {
+  padding: 8px 0;
+  --list-horizontal-offset: 5px;
+  --list-border-color: transparent;
+  border-radius: 0;
+}
+:root.windows menu-drop::part(list-item) {
+  padding: 4px 20px;
+  border-radius: 0;
 }
 </style>
 
@@ -290,8 +303,8 @@ pre {
 }
 </menu-drop>
 
-<button>Test content</button>
 <button onclick="toggleDark();">Toggle Dark Mode</button>
+<button onclick="toggleOSTheme();">Toggle Windows/macOS</button>
 
 </nav>
 
@@ -341,7 +354,6 @@ class MenuDrop extends HTMLElement {
     this.container.appendChild(this.opener);
     this.container.appendChild(this.list);
 
-    this.moveList(this.list);
     this.build_list(this.list);
 
     var openerWidth = window.getComputedStyle(this.opener).getPropertyValue("width"),
@@ -363,7 +375,6 @@ class MenuDrop extends HTMLElement {
       });
       if (!event.target.matches("[part='sub-list-container'] > [part='list-item']")) return;
       event.target.parentElement.setAttribute("active",true);
-      this.moveList(event.target.parentElement.querySelector("[part='list']"));
     });
     list.addEventListener("mouseout",event => {
       if (event.target == list) return;
@@ -410,7 +421,6 @@ class MenuDrop extends HTMLElement {
         itemContainer.appendChild(listItem);
         list.appendChild(itemContainer);
         itemContainer.appendChild(subList);
-        window.setTimeout(() => this.moveList(subList));
       } else {
         list.appendChild(listItem);
       }
@@ -421,21 +431,11 @@ class MenuDrop extends HTMLElement {
       this.build_list(subList);
     });
   }
-  moveList(list){
-    if (list == this.list){
-      this.list.style.setProperty("--list-offset-x",`${this.opener.getBoundingClientRect().left}px`);
-      this.list.style.setProperty("--list-offset-y",`${this.opener.getBoundingClientRect().bottom}px`);
-    } else {
-      list.style.setProperty("--list-offset-x",`${list.parentElement.getBoundingClientRect().right}px`);
-      list.style.setProperty("--list-offset-y",`${list.parentElement.getBoundingClientRect().top}px`);
-    }
-  }
   get active(){
     return this.hasAttribute("active");
   }
   open(){
     this.setAttribute("active",true);
-    this.moveList(this.list);
   }
   close(){
     this.removeAttribute("active");
@@ -460,8 +460,12 @@ window.addEventListener("blur",() => {
 
 <script>
   //toggleDark();
+  toggleOSTheme();
   function toggleDark(){
     document.documentElement.classList.toggle("dark-mode");
+  }
+  function toggleOSTheme(){
+    document.documentElement.classList.toggle("windows");
   }
 </script>
 
