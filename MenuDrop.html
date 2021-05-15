@@ -25,11 +25,11 @@ body {
   box-sizing: border-box;
 }
 :host(menu-drop) {
-  position: relative;
+  position: relative;/*position: fixed;right: 0;top: 0;*/
   display: inline-block;
   color: #000000;
   font-size: 13px;
-  font-family: system-ui;font-family: sans-serif;
+  font-family: system-ui;//font-family: sans-serif;
   white-space: pre;
   user-select: none;
   -webkit-user-select: none;
@@ -50,7 +50,7 @@ body {
 [part="list"] {
   padding: 8px 8px;
   position: absolute;
-  left: 0;
+  --list-position-x: 0;
   top: 100%;
   list-style: none;
   --list-background: #ffffff80;
@@ -74,6 +74,7 @@ body {
   bottom: calc(var(--list-border-width) * -1);
   background: var(--list-background);
   backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   border: var(--list-border-width) solid var(--list-border-color);
   border-radius: inherit;
   pointer-events: none;
@@ -113,7 +114,7 @@ body {
   opacity: 0.6;
 }
 [part="sub-list-container"] [part="list"] {
-  left: calc(100% - var(--list-horizontal-offset,0px));
+  --list-position-x: calc(100% - var(--list-horizontal-offset,0px));
   top: -9px;
 }
 [part="sub-list-container"][active] > [part="list"] {
@@ -176,6 +177,7 @@ pre {
 }
 #source {
   margin-top: 130px;
+  color: #000000;
   background: #ffffff;
 }
 </style>
@@ -188,7 +190,7 @@ pre {
 
 <nav>
 
-<menu-drop>
+<menu-drop active>
 {
   "type": "opener",
   "label": "JSON-based menu"
@@ -230,10 +232,12 @@ pre {
     {
       "type": "list",
       "label": "dropdowndropdown",
+    "active": true,
       "content": [
         {
           "type": "list",
           "label": "dropdowndropdown",
+    "active": true,
           "content": [
             {
               "type": "list-item",
@@ -242,6 +246,7 @@ pre {
             {
               "type": "list",
               "label": "dropdowndropdown",
+    "active": true,
               "content": [
                 {
                   "type": "list-item",
@@ -303,8 +308,8 @@ pre {
 }
 </menu-drop>
 
-<button onclick="toggleDark();">Toggle Dark Mode</button>
-<button onclick="toggleOSTheme();">Toggle Windows/macOS</button>
+<button onclick="event.stopPropagation();toggleDark();">Toggle Dark Mode</button>
+<button onclick="event.stopPropagation();toggleOSTheme();">Toggle Windows/macOS</button>
 
 </nav>
 
@@ -344,7 +349,7 @@ class MenuDrop extends HTMLElement {
       if (event.target.matches("[part='list'] > [part='list-item']")) this.close();
       if (event.target.matches("[part='sub-list-container'] > [part='list-item']")){
         var subListContainer = event.target.closest("[part='sub-list-container']");
-        (!subListContainer.hasAttribute("active")) ? subListContainer.setAttribute("active",true) : subListContainer.removeAttribute("active");
+        (!subListContainer.hasAttribute("active")) ? (() => { subListContainer.setAttribute("active",true); openList(subListContainer.querySelector("[part='list']"));}) : subListContainer.removeAttribute("active");
       }
     });
 
@@ -355,6 +360,7 @@ class MenuDrop extends HTMLElement {
     this.container.appendChild(this.list);
 
     this.build_list(this.list);
+    if (this.active) openList(this.list);
 
     var openerWidth = window.getComputedStyle(this.opener).getPropertyValue("width"),
       listWidth = window.getComputedStyle(this.list).getPropertyValue("width");
@@ -375,6 +381,7 @@ class MenuDrop extends HTMLElement {
       });
       if (!event.target.matches("[part='sub-list-container'] > [part='list-item']")) return;
       event.target.parentElement.setAttribute("active",true);
+      openList(event.target.parentElement.querySelector("[part='list']"));
     });
     list.addEventListener("mouseout",event => {
       if (event.target == list) return;
@@ -421,6 +428,7 @@ class MenuDrop extends HTMLElement {
         itemContainer.appendChild(listItem);
         list.appendChild(itemContainer);
         itemContainer.appendChild(subList);
+        if (element.active) openList(subList);
       } else {
         list.appendChild(listItem);
       }
@@ -436,8 +444,9 @@ class MenuDrop extends HTMLElement {
   }
   open(){
     this.setAttribute("active",true);
+    openList(this.list);
   }
-  close(){
+  close(){//source.textContent = "";
     this.removeAttribute("active");
     this.container.querySelectorAll("[part='sub-list-container'][active]").forEach(subList => subList.removeAttribute("active"));
   }
@@ -451,11 +460,41 @@ window.addEventListener("click",() => {
   });
 });
 
+window.addEventListener("resize",() => {
+  var resizeIdentifier = Math.random().toString();
+  document.documentElement.setAttribute("data-menu-resize-identifier",resizeIdentifier);
+  window.setTimeout(() => {
+    if (document.documentElement.getAttribute("data-menu-resize-identifier") != resizeIdentifier) return;
+    document.querySelectorAll("menu-drop[active]").forEach(menuDrop => menuDrop.container.querySelectorAll("[active] > [part='list']").forEach(list => openList(list)));
+    document.documentElement.removeAttribute("data-menu-resize-identifier");
+  },200);
+});
+
 window.addEventListener("blur",() => {
   document.querySelectorAll("menu-drop[active]").forEach(menuDrop => {
     menuDrop.close();
   });
 });
+
+function openList(list){
+  var inViewport = isInViewport(list.parentElement);
+  list.removeAttribute("style");
+  if (inViewport){
+    list.style.left = "var(--list-position-x)";
+  } else {
+    list.style.right = "var(--list-position-x)";
+  }
+
+  return;/* Testing things */
+  var sourceTemp = list.cloneNode();
+  sourceTemp.removeAttribute("content");
+  sourceTemp.textContent = list.parentElement.querySelector("[part='list-item']").textContent;
+  source.textContent += `${sourceTemp.outerHTML}\n`;
+}
+function isInViewport(element){
+  var bounds = element.getBoundingClientRect();
+  return (bounds.left >= 0 && bounds.right <= window.innerWidth - bounds.width);
+}
 </script>
 
 <script>
