@@ -8,32 +8,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 body {
   margin: 0;
   padding: 0 24px;
+  width: 100%;
+  height: 100%;
   color: #ffffff;
-  background: url("https://www.lefthudson.com/wp-content/uploads/2019/11/sedona-wallpaper-awesome-gallery-sedona-real-inn-amp-suites-ideas-of-sedona-wallpaper.png") no-repeat center;
+  font-family: sans-serif;
+  background: url("https://wallpaperaccess.com/full/170249.jpg") no-repeat center;
+  background-size: cover;
+  overflow: auto;
 }
 </style>
 
 <template id="menu_styles">
 
 <style>
-:host(menu-drop), *, *::before, *::after {
+:host, *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-:host(menu-drop) {
+:host {
   position: relative;/*position: fixed;right: 0;top: 0;*/
   display: inline-block;
   color: #000000;
   font-size: 13px;
-  font-family: system-ui;//font-family: sans-serif;
+  font-family: system-ui, sans-serif;
   white-space: pre;
   user-select: none;
   -webkit-user-select: none;
   -webkit-app-region: no-drag;
+  -webkit-text-size-adjust: 100%;
 }
 [part="container"] {
   display: flex;
@@ -61,9 +72,9 @@ body {
   box-shadow: 0 5px 10px #00000060;
   visibility: hidden;
   opacity: 0;
-  z-index: 1;
+  z-index: 1;/*
   transition: 100ms linear;
-  transition-property: visibility, opacity;
+  transition-property: visibility, opacity;*/
 }
 [part="list"]::before {
   content: "";
@@ -80,7 +91,7 @@ body {
   pointer-events: none;
   z-index: -1;
 }
-:host(menu-drop[active]) [part="container"] > [part="list"] {
+:host([active]) [part="container"] > [part="list"] {
   visibility: visible;
   opacity: 1;
   transition-duration: 0ms;
@@ -92,7 +103,7 @@ body {
   align-items: center;
   border-radius: 4px;
 }
-[part="list-item"]:-webkit-any(:hover,:focus-visible) {
+[part="list-item"]:where(:hover,:focus-visible) {
   color: #eeeeee;
   background: #0763d5;
 }
@@ -101,7 +112,7 @@ body {
   opacity: 0.6;
   pointer-events: none;
 }
-[part="list-item"]:-webkit-any(:hover,:focus-visible) [part="shortcut"] {
+[part="list-item"]:where(:hover,:focus-visible) [part="shortcut"] {
   opacity: 1;
 }
 [part="sub-list-container"] {
@@ -131,14 +142,14 @@ body {
   border-right: none;
   opacity: 0.6;
 }
-[part="sub-list-container"] > [part="list-item"]:-webkit-any(:hover,:focus-visible)::after {
+[part="sub-list-container"] > [part="list-item"]:where(:hover,:focus-visible)::after {
   opacity: 1;
 }
-[part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within) {
+[part="sub-list-container"]:where(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within) {
   --sub-list-item-active-background: #00000030;
   background: var(--sub-list-item-active-background);
 }
-[part="sub-list-container"]:-webkit-any(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within)::after {
+[part="sub-list-container"]:where(:hover,:focus-within,[active]) > [part="list-item"]:not(:hover):not(:focus-within)::after {
   opacity: 1;
 }
 </style>
@@ -151,7 +162,7 @@ body {
   color: #dddddd;
 }
 :root.dark-mode menu-drop::part(list) {
-  --list-background: #24242490;
+  --list-background: #24242480;
   --list-border-color: #ffffff30;
 }
 :root.dark-mode menu-drop::part(list-item) {
@@ -168,17 +179,6 @@ body {
 :root.windows menu-drop::part(list-item) {
   padding: 4px 20px;
   border-radius: 0;
-}
-</style>
-
-<style>
-pre {
-  display: flex;
-}
-#source {
-  margin-top: 130px;
-  color: #000000;
-  background: #ffffff;
 }
 </style>
 
@@ -313,14 +313,7 @@ pre {
 
 </nav>
 
-<textarea id="textarea"></textarea>
-<button>Another element for testing z-index</button>
-
-<pre>
-  <code id="source"></code>
-</pre>
-
-<script>//console.clear();
+<script>console.clear();
 class MenuDrop extends HTMLElement {
   constructor(){
     super();
@@ -370,7 +363,6 @@ class MenuDrop extends HTMLElement {
     //this.container.innerHTML += JSON.stringify(this.layout,null,"  ");
     //textarea.value = this.container.outerHTML;
     //this.container.querySelectorAll("[content]").forEach(element => element.removeAttribute("content"));
-    //source.textContent = this.list.outerHTML.split("><").join(">\n<");
   }
   build_list(list){
     var content = JSON.parse(list.getAttribute("content"));
@@ -385,7 +377,6 @@ class MenuDrop extends HTMLElement {
     });
     list.addEventListener("mouseout",event => {
       if (event.target == list) return;
-      //source.textContent = event.target.cloneNode().outerHTML.split("><").join(`>${event.target.childNodes[0].textContent}<`);
       list.querySelectorAll("[part='sub-list-container'][active]").forEach(itemContainer => {
         itemContainer.removeAttribute("active");
       });
@@ -446,7 +437,7 @@ class MenuDrop extends HTMLElement {
     this.setAttribute("active",true);
     openList(this.list);
   }
-  close(){//source.textContent = "";
+  close(){
     this.removeAttribute("active");
     this.container.querySelectorAll("[part='sub-list-container'][active]").forEach(subList => subList.removeAttribute("active"));
   }
@@ -485,11 +476,7 @@ function openList(list){
     list.style.right = "var(--list-position-x)";
   }
 
-  return;/* Testing things */
-  var sourceTemp = list.cloneNode();
-  sourceTemp.removeAttribute("content");
-  sourceTemp.textContent = list.parentElement.querySelector("[part='list-item']").textContent;
-  source.textContent += `${sourceTemp.outerHTML}\n`;
+  return;
 }
 function isInViewport(element){
   var bounds = element.getBoundingClientRect();
