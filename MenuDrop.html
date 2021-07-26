@@ -5,10 +5,17 @@
 
 <title>MenuDrop</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <style>
+  :root {
+    --safe-area-inset-left: env(safe-area-inset-left,0px);
+    --safe-area-inset-right: env(safe-area-inset-right,0px);
+    --safe-area-inset-top: env(safe-area-inset-top,0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
+  }
   html {
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -16,12 +23,15 @@
   body {
     margin: 0;
     padding: 0 24px;
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
     color: #ffffff;
     font-family: sans-serif;
     background: url("https://wallpaperaccess.com/full/170249.jpg") no-repeat center;
     background-size: cover;
+    border: solid transparent;
+    border-width: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     overflow: auto;
   }
 </style>
@@ -33,18 +43,116 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 :host {
-  position: relative;/*position: fixed;right: 0;top: 0;*/
+  --list-padding: 8px;
+  --list-option-padding: var(--list-option-padding-y) var(--list-option-padding-x);
+  --list-option-padding-x: var(--list-padding);
+  --list-option-padding-y: calc(var(--list-padding) * 0.5);
+  --list-border-width: 1px;
+}
+:host {
+  position: relative;
   display: inline-block;
   color: #000000;
-  font-size: 13px;
+  font-size: 12px;
   font-family: system-ui, sans-serif;
   white-space: pre;
-  user-select: none;
+  cursor: default;
+  z-index: 1;
   -webkit-user-select: none;
+  user-select: none;
   -webkit-app-region: no-drag;
   -webkit-text-size-adjust: 100%;
+}
+[part="container"] {
+  display: flex;
+  flex-direction: column;
+}
+[part="opener"] {
+  padding: var(--list-option-padding);
+  color: inherit;
+  font: inherit;
+  background: #ccc;
+  border: 1px solid #000000;
+}
+.list {
+  padding: var(--list-padding);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: #eeeeee80;
+  border: var(--list-border-width) solid #00000080;
+  border-radius: calc(max(0px,var(--list-padding)) + max(0px,var(--list-border-width)));
+  box-shadow: 0 5px 10px #00000060;
+}
+.list::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--list-border-width) * -1);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: inherit;
+  z-index: -1;
+}
+[part="main"] {
+  left: 0;
+  top: 100%;
+}
+:host(:not([active])) [part="main"] {
+  visibility: hidden;
+}
+.sub-list {
+  position: relative;
+  z-index: 1;
+}
+.sub-list[active] > .option {
+  background: orange;
+}
+.sub-list:not([active]) > .list {
+  visibility: hidden;
+}
+.sub-list > .list {
+  left: calc(100% + max(0px,var(--list-padding)));
+  left: 100%;
+  top: calc(calc(max(0px,var(--list-padding)) + max(0px,var(--list-border-width))) * -1);
+}
+.option {
+  padding: var(--list-option-padding);
+  display: flex;
+  gap: calc(var(--list-option-padding-x) * 3);
+  align-items: center;
+  list-style: none;
+  border-radius: calc(var(--list-padding) / 2);
+}
+.option:hover, .sub-list[active] > .option:hover {
+  background: #0000ff30;
+}
+.option:focus {
+  background: red;
+}
+.sub-list > .option::after {
+  content: "";
+  margin-left: auto;
+  border: 5px solid transparent;
+  border-left-width: 6px;
+  border-left-color: currentColor;
+  border-right: none;
+  opacity: 0.5;
+}
+.option:hover::after {
+  opacity: 1;
+}
+.sub-list[active] > .option::after {
+  opacity: 1;
+}
+hr {
+  margin: var(--list-option-padding);
+  height: 1px;
+  background: currentColor;
+  border: none;
+  opacity: 0.5;
 }
 </style>
 
@@ -59,118 +167,37 @@
 <nav>
 
 <menu-drop>
-{
-  "type": "opener",
-  "name": "JSON-based menu"
-},
-{
-  "type": "list",
-  "content": [
-    {
-      "type": "list",
-      "name": "A nice submenu",
-      "content": [
-        {
-          "type": "list-item",
-          "name": "JSON is cool",
-          "shortcuts": {
-            "default": "Ctrl + Shift + 1"
-          }
-        },
-        {
-          "type": "list-item",
-          "name": "woah fancy"
-        }
-      ]
-    },
-    {
-      "type": "list-item",
-      "name": "noice list"
-    },
-    {
-      "type": "list-item",
-      "name": "Option 2",
-      "shortcuts": {
-        "default": "Ctrl + Shift + 2"
-      }
-    },
-    {
-      "type": "divider"
-    },
-    {
-      "type": "list",
-      "name": "dropdowndropdown",
-      "content": [
-        {
-          "type": "list",
-          "name": "dropdowndropdown",
-          "content": [
-            {
-              "type": "list-item",
-              "name": "goes on for a long time"
-            },
-            {
-              "type": "list",
-              "name": "dropdowndropdown",
-              "content": [
-                {
-                  "type": "list-item",
-                  "name": "goes on for a long time"
-                },
-                {
-                  "type": "list",
-                  "name": "dropdowndropdown",
-                  "content": [
-                    {
-                      "type": "list-item",
-                      "name": "goes on for a long time"
-                    },
-                    {
-                      "type": "list",
-                      "name": "dropdowndropdown",
-                      "content": [
-                        {
-                          "type": "list-item",
-                          "name": "goes on for a long time"
-                        },
-                        {
-                          "type": "list",
-                          "name": "dropdowndropdown",
-                          "content": [
-                            {
-                              "type": "list-item",
-                              "name": "goes on for a long time"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "list-item",
-          "name": "gibberish words"
-        },
-        {
-          "type": "list-item",
-          "name": "content to help test things"
-        }
-      ]
-    },
-    {
-      "type": "list-item",
-      "name": "Really long name for testing"
-    },
-    {
-      "type": "list-item",
-      "name": "Better responsiveness!"
-    }
-  ]
-}
+  <button>HTML-based menu :)</button>
+  <ul>
+    <ul name="A nice submenu">
+      <li shortcuts="{ default: 'Ctrl + Shift + 1' }">HTML is cool</li>
+      <li>woah fancy</li>
+    </ul>
+    <li>noice list</li>
+    <li shortcuts="{ default: 'Ctrl + Shift + 2' }">Option 2</li>
+    <hr>
+    <ul name="dropdowndropdown">
+      <ul name="dropdowndropdown">
+        <li>goes on for a long time</li>
+        <ul name="dropdowndropdown">
+          <li>goes on for a long time</li>
+          <ul name="dropdowndropdown">
+            <li>goes on for a long time</li>
+            <ul name="dropdowndropdown">
+              <li>goes on for a long time</li>
+              <ul name="dropdowndropdown">
+                <li>goes on for a long time</li>
+              </ul>
+            </ul>
+          </ul>
+        </ul>
+      </ul>
+      <li>gibberish words</li>
+      <li>content to help test things</li>
+    </ul>
+    <li>Really long name for testing</li>
+    <li>Better responsiveness!</li>
+  </ul>
 </menu-drop>
 
 </nav>
@@ -180,28 +207,58 @@ class MenuDropElement extends HTMLElement {
   constructor(){
     super();
     this.attachShadow({ mode: "open" });
+    this.defined = false;
   }
   connectedCallback(){
-    var layout = JSON.parse(`[${this.textContent}]`);
-    console.log(layout);
-
+    if (this.defined || !this.isConnected) return;
+    this.defined = true;this.open();
+    this.shadowRoot.addEventListener("keydown",event => {
+      //if (event.key == "ArrowDown")
+    });
+    this.shadowRoot.addEventListener("mouseover",event => {
+      if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
+      if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+    });
+    this.shadowRoot.addEventListener("click",event => {
+      if (event.target.matches("[part='opener']")) this.toggle();
+      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+      if (event.target.matches(".sub-list > .option")) this.toggle(event.target.closest(".sub-list"));
+    });
     this.container = document.createElement("div");
     this.container.part = "container";
-
-    this.opener = document.createElement("button");
+    this.opener = this.querySelector("button") || document.createElement("button");
     this.opener.part = "opener";
-    this.opener.textContent = layout.find(element => element.type == "opener").name || "";
-
-
-    this.createList({ content: layout });
-
+    this.main = this.querySelector("ul") || document.createElement("ul");
+    this.main.part = "main";
+    this.main.classList.add("list");
+    this.main.querySelectorAll("ul").forEach(list => {
+      var container = document.createElement("div"), option = document.createElement("li");
+      container.classList.add("sub-list");
+      option.textContent = list.getAttribute("name");
+      list.classList.add("list");
+      list.parentElement.insertBefore(container,list);
+      container.appendChild(option);
+      container.appendChild(list);this.open(container);
+    });
+    this.main.querySelectorAll("li").forEach(option => {
+      option.classList.add("option");
+      option.tabIndex = 0;
+    });
     this.shadowRoot.appendChild(this.container);
     this.container.appendChild(this.opener);
+    this.container.appendChild(this.main);
+    this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
   }
-  createList({ parent = this.container, content } = {}){
-    content.forEach(element => {
-      
-    });
+  open(section = this){
+    if (section != this) section.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+    section.setAttribute("active",true);
+  }
+  close(section = this){
+    section.removeAttribute("active");
+    ((section != this) ? section : this.main).querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+  }
+  toggle(section = this){
+    (!section.matches("[active]")) ? this.open(section) : this.close(section);
   }
 }
 window.customElements.define("menu-drop",MenuDropElement);
