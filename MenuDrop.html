@@ -65,6 +65,7 @@
   user-select: none;
   -webkit-app-region: no-drag;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 [part="container"] {
   display: flex;
@@ -76,6 +77,7 @@
   font: inherit;
   background: #ccc;
   border: 1px solid #000000;
+  //box-shadow: 0 20px 0 20px black;
 }
 .list {
   padding: var(--list-padding);
@@ -96,11 +98,11 @@
   border-radius: inherit;
   z-index: -1;
 }
-[part="main"] {
-  left: 0;
+.list.main {
+  --list-position-x: 0;
   top: 100%;
 }
-:host(:not([active])) [part="main"] {
+:host(:not([active])) .list.main {
   visibility: hidden;
 }
 .sub-list {
@@ -114,8 +116,8 @@
   visibility: hidden;
 }
 .sub-list > .list {
-  left: calc(100% + max(0px,var(--list-padding)));
-  left: 100%;
+  --list-position-x: calc(100% + max(0px,var(--list-padding)));
+  --list-position-x: 100%;
   top: calc(calc(max(0px,var(--list-padding)) + max(0px,var(--list-border-width))) * -1);
 }
 .option {
@@ -123,6 +125,7 @@
   display: flex;
   gap: calc(var(--list-option-padding-x) * 3);
   align-items: center;
+  color: inherit;
   list-style: none;
   border-radius: calc(var(--list-padding) / 2);
   outline: none;
@@ -130,6 +133,13 @@
 .option:where(:hover,:active,:focus-visible) {
   color: #eeeeee;
   background: #0763d5;
+}
+.shortcut {
+  margin-left: auto;
+  opacity: 0.7;
+}
+.option:is(:hover,:active,:focus-visible) > .shortcut {
+  opacity: 1;
 }
 :focus {
   outline: 2px dashed orange;
@@ -146,7 +156,7 @@
 .option:is(:hover,:active,:focus-visible)::after, .sub-list[active] > .option::after {
   opacity: 1;
 }
-hr {
+.divider {
   margin: var(--list-option-padding);
   height: 1px;
   background: currentColor;
@@ -169,11 +179,12 @@ hr {
   <button>HTML-based menu :)</button>
   <ul>
     <ul name="A nice submenu">
-      <li shortcuts="{ default: 'Ctrl + Shift + 1' }">HTML is cool</li>
+      <li shortcuts='{ "default": "Ctrl + Shift + 1", "macOS": "Shift + Cmd + 1" }'>HTML is cool</li>
       <li>woah fancy</li>
     </ul>
     <li>noice list</li>
-    <li shortcuts="{ default: 'Ctrl + Shift + 2' }">Option 2</li>
+    <a href="https://www.google.com">Go to Google for a Search</a>
+    <li shortcuts='{ "default": "Ctrl + Shift + 2", "macOS": "Shift + Cmd + 2" }'>Option 2</li>
     <hr>
     <ul name="dropdowndropdown">
       <ul name="dropdowndropdown">
@@ -213,25 +224,35 @@ class MenuDropElement extends HTMLElement {
     this.defined = true;this.open();
     this.shadowRoot.addEventListener("keydown",event => {
       if (event.key == "ArrowDown"){
+        event.preventDefault();
         if (event.target.matches("[part='opener'], .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined);
-          var index = options.indexOf(event.target) + 1;
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined), index = options.indexOf(event.target) + 1;
           options[(index <= options.length - 1) ? index : 0].focus();
         }
       }
       if (event.key == "ArrowUp"){
+        event.preventDefault();
         if (event.target.matches("[part='opener'], .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined);
-          var index = options.indexOf(event.target) - 1;
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined), index = options.indexOf(event.target) - 1;
           options[(index >= 0) ? index : options.length - 1].focus();
         }
       }
       if (event.key == "ArrowRight"){
-        if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
+        event.preventDefault();
+        if (event.target.matches(".sub-list > .option")){
+          var subList = event.target.closest(".sub-list"), option = this.getOptions(subList.querySelector(".list"))[0];
+          this.open(subList);
+          option.focus();
+        }
       }
       if (event.key == "ArrowLeft"){
+        event.preventDefault();
         if (event.target.matches(".sub-list[active] > .option")) return this.close(event.target.closest(".sub-list"));
-        if (event.target.matches(".option")) this.close(event.target.closest(".list").closest(".sub-list"));
+        if (event.target.matches(".option")){
+          var subList = event.target.closest(".list").closest(".sub-list"), option = subList.querySelector(".option");
+          this.close(subList);
+          option.focus();
+        }
       }
       if (event.key == "Escape" || event.key == "Tab"){
         if (this.matches("[active]")){
@@ -255,31 +276,56 @@ class MenuDropElement extends HTMLElement {
       if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
     });
     this.shadowRoot.addEventListener("pointerdown",event => {
+      if (event.pointerType != "mouse") return;
+      if (event.button != 0 && !event.target.matches("a")) event.preventDefault();
+      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+    });
+    this.shadowRoot.addEventListener("pointerup",event => {
+      if (event.pointerType == "mouse") return;
       if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
     });
     this.shadowRoot.addEventListener("click",event => {
       if (event.target.matches("[part='opener']")) this.toggle();
       if (event.target.matches(".sub-list > .option")) this[(!event.pointerType == "mouse") ? "open" : "toggle"](event.target.closest(".sub-list"));
     });
+    this.shadowRoot.addEventListener("contextmenu",event => {
+      if (!event.target.matches("a")) event.preventDefault();
+    });
     this.container = document.createElement("div");
     this.container.part = "container";
+    this.container.setAttribute("ontouchstart",true);
     this.opener = this.querySelector("button") || document.createElement("button");
     this.opener.part = "opener";
     this.main = this.querySelector("ul") || document.createElement("ul");
-    this.main.part = "main";
+    this.main.part = "list";
     this.main.classList.add("list");
+    this.main.classList.add("main");
     this.main.querySelectorAll("ul").forEach(list => {
-      var container = document.createElement("div"), option = document.createElement("li");
-      container.classList.add("sub-list");
+      var subList = document.createElement("div"), option = document.createElement("li");
+      subList.classList.add("sub-list");
       option.textContent = list.getAttribute("name");
+      list.part = "list";
       list.classList.add("list");
-      list.parentElement.insertBefore(container,list);
-      container.appendChild(option);
-      container.appendChild(list);this.open(container);
+      list.parentElement.insertBefore(subList,list);
+      subList.appendChild(option);
+      subList.appendChild(list);window.requestAnimationFrame(() => this.open(subList));
     });
-    this.main.querySelectorAll("li").forEach(option => {
+    this.main.querySelectorAll("li, a").forEach(option => {
+      option.part = "option";
       option.classList.add("option");
       option.tabIndex = -1;
+      if (!option.matches("[shortcuts]")) return;
+      var shortcuts = JSON.parse(option.getAttribute("shortcuts"));
+      if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Shift/g,"⇧").replace(/Ctrl/g,"⌃").replace(/Cmd/g,"⌘").replace(/ \+ /g,"");
+      var shortcut = document.createElement("span");
+      shortcut.part = "shortcut";
+      shortcut.classList.add("shortcut");
+      shortcut.textContent = shortcuts[(!/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)) ? "default" : "macOS"];
+      option.appendChild(shortcut);
+    });
+    this.main.querySelectorAll("hr").forEach(option => {
+      option.part = "divider";
+      option.classList.add("divider");
     });
     this.shadowRoot.appendChild(this.container);
     this.container.appendChild(this.opener);
@@ -287,8 +333,11 @@ class MenuDropElement extends HTMLElement {
     this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
   }
   open(section = this){
-    if (section.matches("[active]")) return;
-    if (section != this) section.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+    if (section != this){
+      section.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+      section.querySelector(".list").removeAttribute("style");
+      section.querySelector(".list").style[(this.getVisibility(section)) ? "left" : "right"] = "var(--list-position-x)";
+    }
     section.setAttribute("active",true);
   }
   close(section = this){
@@ -302,6 +351,10 @@ class MenuDropElement extends HTMLElement {
   getOptions(container = this.main){
     var elements = container.querySelectorAll(":scope > .option, :scope > .sub-list > .option");
     return Array.from(elements).filter(element => (window.getComputedStyle(element).getPropertyValue("display") != "none"));
+  }
+  getVisibility(element = this.main){
+    var bounds = element.getBoundingClientRect();
+    return (bounds.left >= 0 && bounds.right <= window.innerWidth - bounds.width);
   }
 }
 window.customElements.define("menu-drop",MenuDropElement);
