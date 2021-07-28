@@ -82,7 +82,7 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  background: #eeeeee80;
+  background: #ffffff80;
   border: var(--list-border-width) solid #00000080;
   border-radius: calc(max(0px,var(--list-padding)) + max(0px,var(--list-border-width)));
   box-shadow: 0 5px 10px #00000060;
@@ -107,8 +107,8 @@
   position: relative;
   z-index: 1;
 }
-.sub-list[active] > .option {
-  background: orange;
+.sub-list[active] > .option:not(:where(:hover,:active,:focus-visible)) {
+  background: #00000030;
 }
 .sub-list:not([active]) > .list {
   visibility: hidden;
@@ -125,12 +125,14 @@
   align-items: center;
   list-style: none;
   border-radius: calc(var(--list-padding) / 2);
+  outline: none;
 }
-.option:hover, .sub-list[active] > .option:hover {
-  background: #0000ff30;
+.option:where(:hover,:active,:focus-visible) {
+  color: #eeeeee;
+  background: #0763d5;
 }
-.option:focus {
-  background: red;
+:focus {
+  outline: 2px dashed orange;
 }
 .sub-list > .option::after {
   content: "";
@@ -141,10 +143,7 @@
   border-right: none;
   opacity: 0.5;
 }
-.option:hover::after {
-  opacity: 1;
-}
-.sub-list[active] > .option::after {
+.option:is(:hover,:active,:focus-visible)::after, .sub-list[active] > .option::after {
   opacity: 1;
 }
 hr {
@@ -166,7 +165,7 @@ hr {
 
 <nav>
 
-<menu-drop>
+<menu-drop id="menu">
   <button>HTML-based menu :)</button>
   <ul>
     <ul name="A nice submenu">
@@ -213,16 +212,54 @@ class MenuDropElement extends HTMLElement {
     if (this.defined || !this.isConnected) return;
     this.defined = true;this.open();
     this.shadowRoot.addEventListener("keydown",event => {
-      //if (event.key == "ArrowDown")
+      if (event.key == "ArrowDown"){
+        if (event.target.matches("[part='opener'], .option")){
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined);
+          var index = options.indexOf(event.target) + 1;
+          options[(index <= options.length - 1) ? index : 0].focus();
+        }
+      }
+      if (event.key == "ArrowUp"){
+        if (event.target.matches("[part='opener'], .option")){
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined);
+          var index = options.indexOf(event.target) - 1;
+          options[(index >= 0) ? index : options.length - 1].focus();
+        }
+      }
+      if (event.key == "ArrowRight"){
+        if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
+      }
+      if (event.key == "ArrowLeft"){
+        if (event.target.matches(".sub-list[active] > .option")) return this.close(event.target.closest(".sub-list"));
+        if (event.target.matches(".option")) this.close(event.target.closest(".list").closest(".sub-list"));
+      }
+      if (event.key == "Escape" || event.key == "Tab"){
+        if (this.matches("[active]")){
+          event.preventDefault();
+          this.close();
+          this.opener.focus();
+        }
+      }
+      if (event.key == "Enter"){
+        if (event.target.matches(".option")) event.target.click();
+      }
     });
-    this.shadowRoot.addEventListener("mouseover",event => {
+    this.shadowRoot.addEventListener("keyup",event => {
+      if (event.key == " "){
+        if (event.target.matches(".option")) event.target.click();
+      }
+    });
+    this.shadowRoot.addEventListener("pointerover",event => {
+      if (event.pointerType != "mouse") return;
       if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
       if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
     });
+    this.shadowRoot.addEventListener("pointerdown",event => {
+      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+    });
     this.shadowRoot.addEventListener("click",event => {
       if (event.target.matches("[part='opener']")) this.toggle();
-      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
-      if (event.target.matches(".sub-list > .option")) this.toggle(event.target.closest(".sub-list"));
+      if (event.target.matches(".sub-list > .option")) this[(!event.pointerType == "mouse") ? "open" : "toggle"](event.target.closest(".sub-list"));
     });
     this.container = document.createElement("div");
     this.container.part = "container";
@@ -242,7 +279,7 @@ class MenuDropElement extends HTMLElement {
     });
     this.main.querySelectorAll("li").forEach(option => {
       option.classList.add("option");
-      option.tabIndex = 0;
+      option.tabIndex = -1;
     });
     this.shadowRoot.appendChild(this.container);
     this.container.appendChild(this.opener);
@@ -250,15 +287,21 @@ class MenuDropElement extends HTMLElement {
     this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
   }
   open(section = this){
+    if (section.matches("[active]")) return;
     if (section != this) section.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
     section.setAttribute("active",true);
   }
   close(section = this){
+    if (!section.matches("[active]")) return;
     section.removeAttribute("active");
     ((section != this) ? section : this.main).querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
   }
   toggle(section = this){
     (!section.matches("[active]")) ? this.open(section) : this.close(section);
+  }
+  getOptions(container = this.main){
+    var elements = container.querySelectorAll(":scope > .option, :scope > .sub-list > .option");
+    return Array.from(elements).filter(element => (window.getComputedStyle(element).getPropertyValue("display") != "none"));
   }
 }
 window.customElements.define("menu-drop",MenuDropElement);
