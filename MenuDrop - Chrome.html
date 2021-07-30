@@ -3,7 +3,7 @@
 
 <head>
 
-<title>MenuDrop</title>
+<title>MenuDrop - Chrome</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
@@ -26,9 +26,9 @@
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    color: #ffffff;
+    color: #000000;
     font-family: sans-serif;
-    background: url("https://wallpaperaccess.com/full/170249.jpg") no-repeat center;
+    //background: url("https://wallpaperaccess.com/full/170249.jpg") no-repeat center;
     background-size: cover;
     border: solid transparent;
     border-width: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
@@ -47,13 +47,13 @@
 }
 :host {
   --list-padding: max(0px,var(--list-padding-y)) max(0px,var(--list-padding-x));
-  --list-padding-x: 8px;
-  --list-padding-y: 8px;
+  --list-padding-x: 0px;
+  --list-padding-y: 3px;
   --list-option-padding: max(0px,var(--list-option-padding-y)) max(0px,var(--list-option-padding-x));
-  --list-option-padding-x: var(--list-padding-x);
-  --list-option-padding-y: calc(var(--list-padding-y) * 0.5);
+  --list-option-padding-x: 20px;
+  --list-option-padding-y: calc(var(--list-padding-y) * 1.75);
   --list-border-width: 1px;
-  --list-border-radius: 8px;
+  --list-border-radius: 0;
 }
 :host {
   position: relative;
@@ -78,7 +78,7 @@
   padding: var(--list-option-padding);
   color: inherit;
   font: inherit;
-  background: #ccc;
+  background: #ddd;
   border: 1px solid #000000;
   //box-shadow: 0 20px 0 20px black;
 }
@@ -87,19 +87,10 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  background: #ffffff80;
-  border: var(--list-border-width) solid #00000080;
+  background: #ffffff;
+  border: var(--list-border-width) solid #00000040;
   border-radius: calc(max(0px,var(--list-border-radius)) + max(0px,var(--list-border-width)));
-  box-shadow: 0 5px 10px #00000060;
-}
-.list::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--list-border-width) * -1);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border-radius: inherit;
-  z-index: -1;
+  box-shadow: 5px 5px 3px -3px #00000060;
 }
 .list.main {
   --list-position-x: 0;
@@ -113,14 +104,14 @@
   z-index: 1;
 }
 .sub-list[active] > .option:not(:where(:hover,:active,:focus-visible)) {
-  background: #00000030;
+  background: #00000020;
 }
 .sub-list:not([active]) > .list {
   visibility: hidden;
 }
 .sub-list > .list {
   --list-position-x: calc(100% + max(0px,var(--list-padding-x)));
-  --list-position-x: 100%;
+  --list-position-x: calc(100% - 2px);
   top: calc(calc(max(0px,var(--list-padding-y)) + max(0px,var(--list-border-width))) * -1);
 }
 .option {
@@ -134,18 +125,14 @@
   outline: none;
 }
 .option:where(:hover,:active,:focus-visible) {
-  color: #eeeeee;
-  background: #0763d5;
+  background: #00000020;
 }
 .shortcut {
   margin-left: auto;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 .option:is(:hover,:active,:focus-visible) > .shortcut {
   opacity: 1;
-}
-:focus {
-  outline: 2px dashed orange;
 }
 .sub-list > .option::after {
   content: "";
@@ -160,11 +147,11 @@
   opacity: 1;
 }
 .divider {
-  margin: var(--list-option-padding);
+  margin: calc(max(0px,var(--list-option-padding-y)) / 1.5) 1px;
   height: 1px;
   background: currentColor;
   border: none;
-  opacity: 0.5;
+  opacity: 0.25;
 }
 </style>
 
