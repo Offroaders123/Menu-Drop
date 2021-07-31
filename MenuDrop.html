@@ -91,6 +91,7 @@
   border: var(--list-border-width) solid #00000080;
   border-radius: calc(max(0px,var(--list-border-radius)) + max(0px,var(--list-border-width)));
   box-shadow: 0 5px 10px #00000060;
+  outline: none;
 }
 .list::before {
   content: "";
@@ -112,7 +113,7 @@
   position: relative;
   z-index: 1;
 }
-.sub-list[active] > .option:not(:where(:hover,:active,:focus-visible)) {
+.sub-list[active] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
   background: #00000030;
 }
 .sub-list:not([active]) > .list {
@@ -133,15 +134,16 @@
   border-radius: calc(var(--list-border-radius) / 2);
   outline: none;
 }
-.option:where(:hover,:active,:focus-visible) {
+.option:where(:hover:focus,:active,:focus-visible) {
   color: #eeeeee;
   background: #0763d5;
 }
 .shortcut {
   margin-left: auto;
   opacity: 0.7;
+  pointer-events: none;
 }
-.option:is(:hover,:active,:focus-visible) > .shortcut {
+.option:is(:hover:focus,:active,:focus-visible) > .shortcut {
   opacity: 1;
 }
 :focus {
@@ -156,7 +158,7 @@
   border-right: none;
   opacity: 0.5;
 }
-.option:is(:hover,:active,:focus-visible)::after, .sub-list[active] > .option::after {
+.option:is(:hover:focus,:active,:focus-visible)::after, .sub-list[active] > .option::after {
   opacity: 1;
 }
 .divider {
@@ -213,6 +215,12 @@
   </ul>
 </menu-drop>
 
+<select>
+  <option>aha</option>
+  <option>dasdasdasd</option>
+  <option>xcvxcvxcv</option>
+</select>
+
 </nav>
 
 <script>console.clear();
@@ -229,17 +237,23 @@ class MenuDropElement extends HTMLElement {
       if (event.key == "ArrowDown"){
         event.preventDefault();
         if (!this.matches("[active]")) return;
-        if (event.target.matches("[part='opener'], .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined), index = options.indexOf(event.target) + 1;
+        if (event.target.matches("[part='opener'], .list, .option")){
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) + 1;
           options[(index <= options.length - 1) ? index : 0].focus();
         }
       }
       if (event.key == "ArrowUp"){
         event.preventDefault();
         if (!this.matches("[active]")) return;
-        if (event.target.matches("[part='opener'], .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : undefined), index = options.indexOf(event.target) - 1;
+        if (event.target.matches("[part='opener'], .list, .option")){
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) - 1;
           options[(index >= 0) ? index : options.length - 1].focus();
+        }
+      }
+      if (event.key == "ArrowRight" || event.key == "ArrowLeft"){
+        if (event.target.matches(".list")){
+          var options = this.getOptions(event.target), index = options.indexOf(event.target) + 1;
+          options[(index <= options.length - 1) ? index : 0].focus();
         }
       }
       if (event.key == "ArrowRight"){
@@ -287,22 +301,33 @@ class MenuDropElement extends HTMLElement {
         if (event.target.matches(".sub-list > .option")) this.getOptions(event.target.closest(".sub-list").querySelector(".list"))[0].focus();
       }
     });
-    this.shadowRoot.addEventListener("pointerover",event => {
+    this.shadowRoot.addEventListener("pointerdown",event => {
       if (event.pointerType != "mouse") return;
+      if ((event.button != 0 && !event.target.matches("a")) || event.target.matches(".list")) event.preventDefault();
+      if (event.target.matches(".list")){
+        event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+        event.target.focus();
+      }
+    });
+    this.shadowRoot.addEventListener("pointermove",event => {
+      if (event.pointerType != "mouse") return;
+      if (event.target == this.shadowRoot.activeElement) return;
+      if (event.target.matches(".option")) event.target.focus();
       if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
       if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
     });
-    this.shadowRoot.addEventListener("pointerdown",event => {
-      if (event.pointerType != "mouse") return;
-      if (event.button != 0 && !event.target.matches("a")) event.preventDefault();
-      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
-    });
     this.shadowRoot.addEventListener("pointerup",event => {
       if (event.pointerType == "mouse") return;
-      if (event.target.matches(".list")) event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+      if (event.target.matches(".list")){
+        event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+        event.target.focus();
+      }
     });
     this.shadowRoot.addEventListener("click",event => {
-      if (event.target.matches("[part='opener']")) this.toggle();
+      if (event.target.matches("[part='opener']")){
+        if (event.target != this.shadowRoot.activeElement) event.target.focus();
+        this.toggle();
+      }
       if (event.target.matches(".sub-list > .option")) return this[(!event.pointerType == "mouse") ? "open" : "toggle"](event.target.closest(".sub-list"));
       if (event.target.matches(".option")){
         this.close();
@@ -311,6 +336,12 @@ class MenuDropElement extends HTMLElement {
     });
     this.shadowRoot.addEventListener("contextmenu",event => {
       if (!event.target.matches("a")) event.preventDefault();
+    });
+    this.shadowRoot.addEventListener("focusout",event => {
+      window.requestAnimationFrame(() => {
+        if (document.activeElement == this) return;
+        if (this.matches("[active]")) this.close();
+      });
     });
     this.container = document.createElement("div");
     this.container.part = "container";
@@ -321,12 +352,14 @@ class MenuDropElement extends HTMLElement {
     this.main.part = "list";
     this.main.classList.add("list");
     this.main.classList.add("main");
+    this.main.tabIndex = -1;
     this.main.querySelectorAll("ul").forEach(list => {
       var subList = document.createElement("div"), option = document.createElement("li");
       subList.classList.add("sub-list");
       option.textContent = list.getAttribute("name");
       list.part = "list";
       list.classList.add("list");
+      list.tabIndex = -1;
       list.parentElement.insertBefore(subList,list);
       subList.appendChild(option);
       subList.appendChild(list);//window.requestAnimationFrame(() => this.open(subList));
