@@ -60,7 +60,7 @@
   display: inline-block;
   color: #000000;
   font-size: 12px;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   white-space: pre;
   cursor: default;
   z-index: 1;
@@ -87,20 +87,25 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  background: #ffffff80;
+  background: #cccccc;
   border: var(--list-border-width) solid #00000080;
   border-radius: calc(max(0px,var(--list-border-radius)) + max(0px,var(--list-border-width)));
   box-shadow: 0 5px 10px #00000060;
   outline: none;
 }
-.list::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--list-border-width) * -1);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border-radius: inherit;
-  z-index: -1;
+@supports (backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px)) {
+  .list {
+    background: #ffffff80;
+  }
+  .list::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--list-border-width) * -1);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-radius: inherit;
+    z-index: -1;
+  }
 }
 .list.main {
   --list-position-x: 0;
@@ -115,6 +120,11 @@
 }
 .sub-list[active] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
   background: #00000030;
+}
+@media (hover: none) and (pointer: coarse) {
+  .sub-list[active] > .option:not(:hover) {
+    background: #00000030;
+  }
 }
 .sub-list:not([active]) > .list {
   visibility: hidden;
@@ -138,6 +148,12 @@
   color: #eeeeee;
   background: #0763d5;
 }
+@media (hover: none) and (pointer: coarse) {
+  .option:hover {
+    color: #eeeeee;
+    background: #0763d5;
+  }
+}
 .shortcut {
   margin-left: auto;
   opacity: 0.7;
@@ -146,12 +162,18 @@
 .option:is(:hover:focus,:active,:focus-visible) > .shortcut {
   opacity: 1;
 }
+@media (hover: none) and (pointer: coarse) {
+  .option:hover > .shortcut {
+    opacity: 1;
+  }
+}
 :focus {
   outline: 2px dashed orange;
 }
 .sub-list > .option::after {
   content: "";
   margin-left: auto;
+  height: 10px;
   border: 5px solid transparent;
   border-left-width: 6px;
   border-left-color: currentColor;
@@ -161,9 +183,15 @@
 .option:is(:hover:focus,:active,:focus-visible)::after, .sub-list[active] > .option::after {
   opacity: 1;
 }
+@media (hover: none) and (pointer: coarse) {
+  .option:hover::after {
+    opacity: 1;
+  }
+}
 .divider {
   margin: var(--list-option-padding);
   height: 1px;
+  color: inherit;
   background: currentColor;
   border: none;
   opacity: 0.5;
@@ -184,12 +212,12 @@
   <button>HTML-based menu :)</button>
   <ul>
     <ul name="A nice submenu">
-      <li shortcuts='{ "default": "Ctrl + Shift + 1", "macOS": "Shift + Cmd + 1" }'>HTML is cool</li>
+      <li shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Shift+Cmd+1" }'>HTML is cool</li>
       <li>woah fancy</li>
     </ul>
-    <li>noice list</li>
+    <li onclick="alert('noice list bro! hehe');">noice list</li>
     <a href="https://www.google.com">Go to Google for a Search</a>
-    <li shortcuts='{ "default": "Ctrl + Shift + 2", "macOS": "Shift + Cmd + 2" }'>Option 2</li>
+    <li shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Shift+Cmd+2" }'>Option 2</li>
     <hr>
     <ul name="dropdowndropdown">
       <ul name="dropdowndropdown">
@@ -251,6 +279,8 @@ class MenuDropElement extends HTMLElement {
         }
       }
       if (event.key == "ArrowRight" || event.key == "ArrowLeft"){
+        event.preventDefault();
+        if (!this.matches("[active]")) return;
         if (event.target.matches(".list")){
           var options = this.getOptions(event.target), index = options.indexOf(event.target) + 1;
           options[(index <= options.length - 1) ? index : 0].focus();
@@ -285,6 +315,7 @@ class MenuDropElement extends HTMLElement {
         if (this.matches("[active]")) event.preventDefault();
       }
       if (event.key == "Enter"){
+        if (!this.matches("[active]")) return;
         if (event.target.matches(".option")){
           event.preventDefault();
           event.target.click();
@@ -294,6 +325,7 @@ class MenuDropElement extends HTMLElement {
     });
     this.shadowRoot.addEventListener("keyup",event => {
       if (event.key == " "){
+        if (!this.matches("[active]")) return;
         if (event.target.matches(".option")){
           event.preventDefault();
           event.target.click();
@@ -302,8 +334,13 @@ class MenuDropElement extends HTMLElement {
       }
     });
     this.shadowRoot.addEventListener("pointerdown",event => {
+      this.shadowRoot.pointerType = event.pointerType;
       if (event.pointerType != "mouse") return;
       if ((event.button != 0 && !event.target.matches("a")) || event.target.matches(".list")) event.preventDefault();
+      if (event.target.matches("[part='opener']")){
+        if (event.target != this.shadowRoot.activeElement) event.target.focus();
+        this.toggle();
+      }
       if (event.target.matches(".list")){
         event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
         event.target.focus();
@@ -324,7 +361,10 @@ class MenuDropElement extends HTMLElement {
       }
     });
     this.shadowRoot.addEventListener("click",event => {
+      if (!("pointerType" in event)) event.pointerType = this.shadowRoot.pointerType;
+      delete this.shadowRoot.pointerType;
       if (event.target.matches("[part='opener']")){
+        if (event.pointerType == "mouse") return;
         if (event.target != this.shadowRoot.activeElement) event.target.focus();
         this.toggle();
       }
@@ -368,14 +408,16 @@ class MenuDropElement extends HTMLElement {
       option.part = "option";
       option.classList.add("option");
       option.tabIndex = -1;
-      if (!option.matches("[shortcuts]")) return;
-      var shortcuts = JSON.parse(option.getAttribute("shortcuts"));
-      if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Shift/g,"⇧").replace(/Ctrl/g,"⌃").replace(/Cmd/g,"⌘").replace(/ \+ /g,"");
-      var shortcut = document.createElement("span");
-      shortcut.part = "shortcut";
-      shortcut.classList.add("shortcut");
-      shortcut.textContent = shortcuts[(!/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)) ? "default" : "macOS"];
-      option.appendChild(shortcut);
+      if (option.matches("[shortcuts]")){
+        var shortcuts = JSON.parse(option.getAttribute("shortcuts"));
+        if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Shift/g,"⇧").replace(/Ctrl/g,"⌃").replace(/Cmd/g,"⌘").replace(/\+/g,"");
+        var shortcut = document.createElement("span");
+        shortcut.part = "shortcut";
+        shortcut.classList.add("shortcut");
+        shortcut.textContent = shortcuts[(!/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)) ? "default" : "macOS"];
+        option.appendChild(shortcut);
+      }
+      if (option.matches("[onclick]")) option.setAttribute("onclick",`window.setTimeout(${option.onclick});`);
     });
     this.main.querySelectorAll("hr").forEach(divider => {
       divider.part = "divider";
