@@ -60,7 +60,7 @@
   display: inline-block;
   color: #000000;
   font-size: 12px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
   white-space: pre;
   cursor: default;
   z-index: 1;
@@ -76,11 +76,24 @@
 }
 [part="opener"] {
   padding: var(--list-option-padding);
+  display: flex;
+  gap: var(--list-option-padding-x);
+  align-items: center;
   color: inherit;
   font: inherit;
-  background: #ccc;
+  background: #cccccc;
   border: 1px solid #000000;
   //box-shadow: 0 20px 0 20px black;
+}
+:host([select]) [part="opener"]::after {
+  content: "";
+  margin-left: auto;
+  height: 6px;
+  border: 5px solid transparent;
+  border-top-width: 6px;
+  border-top-color: currentColor;
+  border-bottom: none;
+  opacity: 0.75;
 }
 .list {
   padding: var(--list-padding);
@@ -118,6 +131,9 @@
   position: relative;
   z-index: 1;
 }
+:host([select]) :is(.sub-list,.sub-list > .option) {
+  display: none;
+}
 .sub-list[active] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
   background: #00000030;
 }
@@ -154,6 +170,21 @@
     background: #0763d5;
   }
 }
+:host([select]) .option::before {
+  content: "✓";
+  margin-left: calc(var(--list-option-padding-x) * -0.5);
+  margin-right: calc(var(--list-option-padding-x) * -2.25);
+}
+:host([select]) .option:not([checked])::before {
+  visibility: hidden;
+}
+:host([select]) a.option {
+  display: none;
+}
+.option[disabled] {
+  opacity: 0.7;
+  pointer-events: none;
+}
 .shortcut {
   margin-left: auto;
   opacity: 0.7;
@@ -166,6 +197,9 @@
   .option:hover > .shortcut {
     opacity: 1;
   }
+}
+:host([select]) .shortcut {
+  display: none;
 }
 :focus {
   outline: 2px dashed orange;
@@ -180,7 +214,7 @@
   border-right: none;
   opacity: 0.5;
 }
-.option:is(:hover:focus,:active,:focus-visible)::after, .sub-list[active] > .option::after {
+:is(.option:is(:hover:focus,:active,:focus-visible), .sub-list[active] > .option)::after {
   opacity: 1;
 }
 @media (hover: none) and (pointer: coarse) {
@@ -208,7 +242,7 @@
 
 <nav>
 
-<menu-drop id="menu">
+<menu-drop id="menu" select>
   <button>HTML-based menu :)</button>
   <ul>
     <ul name="A nice submenu">
@@ -217,7 +251,7 @@
     </ul>
     <li onclick="alert('noice list bro! hehe');">noice list</li>
     <a href="https://www.google.com">Go to Google for a Search</a>
-    <li shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Shift+Cmd+2" }'>Option 2</li>
+    <li shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Shift+Cmd+2" }' checked>Option 2</li>
     <hr>
     <ul name="dropdowndropdown">
       <ul name="dropdowndropdown">
@@ -238,7 +272,7 @@
       <li>gibberish words</li>
       <li>content to help test things</li>
     </ul>
-    <li>Really long name for testing</li>
+    <li disabled>Really long name for testing</li>
     <li>Better responsiveness!</li>
   </ul>
 </menu-drop>
@@ -266,16 +300,26 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
         if (!this.matches("[active]")) return;
         if (event.target.matches("[part='opener'], .list, .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) + 1;
-          options[(index <= options.length - 1) ? index : 0].focus();
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) + 1, option = options[(index <= options.length - 1) ? index : 0];
+          option.focus();
+          if (this.matches("[select]") && option.matches(".option")){
+            this.getOptions(option.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
+            option.setAttribute("checked",true);
+            this.opener.textContent = option.childNodes[0].textContent;
+          }
         }
       }
       if (event.key == "ArrowUp"){
         event.preventDefault();
         if (!this.matches("[active]")) return;
         if (event.target.matches("[part='opener'], .list, .option")){
-          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) - 1;
-          options[(index >= 0) ? index : options.length - 1].focus();
+          var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) - 1, option = options[(index >= 0) ? index : options.length - 1];
+          option.focus();
+          if (this.matches("[select]") && option.matches(".option")){
+            this.getOptions(option.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
+            option.setAttribute("checked",true);
+            this.opener.textContent = option.childNodes[0].textContent;
+          }
         }
       }
       if (event.key == "ArrowRight" || event.key == "ArrowLeft"){
@@ -370,6 +414,11 @@ class MenuDropElement extends HTMLElement {
       }
       if (event.target.matches(".sub-list > .option")) return this[(!event.pointerType == "mouse") ? "open" : "toggle"](event.target.closest(".sub-list"));
       if (event.target.matches(".option")){
+        if (this.matches("[select]") && !event.target.matches("[disabled]")){
+          this.getOptions(event.target.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
+          event.target.setAttribute("checked",true);
+          this.opener.textContent = event.target.childNodes[0].textContent;
+        }
         this.close();
         this.opener.focus();
       }
@@ -427,6 +476,10 @@ class MenuDropElement extends HTMLElement {
     this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
     this.container.appendChild(this.opener);
     this.container.appendChild(this.main);
+    if (this.matches("[select]")){
+      this.opener.style.minWidth = `${this.main.offsetWidth}px`;
+      if (this.main.querySelector(".option[checked]")) this.opener.textContent = this.main.querySelector(".option[checked]").childNodes[0].textContent;
+    }
   }
   open(section = this){
     if (section != this){
@@ -446,7 +499,7 @@ class MenuDropElement extends HTMLElement {
   }
   getOptions(container = this.main){
     var elements = container.querySelectorAll(":scope > .option, :scope > .sub-list > .option");
-    return Array.from(elements).filter(element => (window.getComputedStyle(element).getPropertyValue("display") != "none"));
+    return Array.from(elements).filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[disabled]")));
   }
   getVisibility(element = this.main){
     var bounds = element.getBoundingClientRect();
