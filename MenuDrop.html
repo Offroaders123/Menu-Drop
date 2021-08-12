@@ -61,7 +61,7 @@
   color: #000000;
   font-size: 12px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
-  white-space: pre;
+  white-space: nowrap;
   cursor: default;
   z-index: 1;
   -webkit-user-select: none;
@@ -85,7 +85,7 @@
   border: 1px solid #000000;
   //box-shadow: 0 20px 0 20px black;
 }
-:host([select]) [part="opener"]::after {
+:host([data-select]) [part="opener"]::after {
   content: "";
   margin-left: auto;
   height: 6px;
@@ -100,6 +100,7 @@
   position: absolute;
   display: flex;
   flex-direction: column;
+  list-style: none;
   background: #cccccc;
   border: var(--list-border-width) solid #00000080;
   border-radius: calc(max(0px,var(--list-border-radius)) + max(0px,var(--list-border-width)));
@@ -124,27 +125,33 @@
   --list-position-x: 0;
   top: 100%;
 }
-:host(:not([active])) .list.main {
+:host(:not([data-open])) .list.main {
   visibility: hidden;
+}
+.list.left {
+  left: var(--list-position-x);
+}
+.list.right {
+  right: var(--list-position-x);
 }
 .sub-list {
   position: relative;
   z-index: 1;
 }
-:host([select]) :is(.sub-list,.sub-list > .option) {
+:host([data-select]) :is(.sub-list,.sub-list > .option) {
   display: none;
 }
 @media (hover: hover) and (pointer: fine) {
-  .sub-list[active] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
+  .sub-list[data-open] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
     background: #00000030;
   }
 }
 @media (hover: none) and (pointer: coarse) {
-  .sub-list[active] > .option:not(:where(:hover,:active,:focus-visible)) {
+  .sub-list[data-open] > .option:not(:where(:hover,:active,:focus-visible)) {
     background: #00000030;
   }
 }
-.sub-list:not([active]) > .list {
+.sub-list:not([data-open]) > .list {
   visibility: hidden;
 }
 .sub-list > .list {
@@ -158,7 +165,6 @@
   gap: calc(var(--list-option-padding-x) * 3);
   align-items: center;
   color: inherit;
-  list-style: none;
   border-radius: calc(var(--list-border-radius) / 2);
   outline: none;
 }
@@ -174,18 +180,18 @@
     background: #0763d5;
   }
 }
-:host([select]) .option::before {
+:host([data-select]) .option::before {
   content: "✓";
   margin-left: calc(var(--list-option-padding-x) * -0.5);
   margin-right: calc(var(--list-option-padding-x) * -2.25);
 }
-:host([select]) .option:not([checked])::before {
+:host([data-select]) .option:not([data-checked])::before {
   visibility: hidden;
 }
-:host([select]) a.option {
+:host([data-select]) a.option {
   display: none;
 }
-.option[disabled] {
+.option[data-disabled] {
   opacity: 0.7;
   pointer-events: none;
 }
@@ -204,7 +210,7 @@
     opacity: 1;
   }
 }
-:host([select]) .shortcut {
+:host([data-select]) .shortcut {
   display: none;
 }
 :focus {
@@ -221,12 +227,12 @@
   opacity: 0.5;
 }
 @media (hover: hover) and (pointer: fine) {
-  :is(.option:is(:hover:focus,:active,:focus-visible), .sub-list[active] > .option)::after {
+  :is(.option:is(:hover:focus,:active,:focus-visible), .sub-list[data-open] > .option)::after {
     opacity: 1;
   }
 }
 @media (hover: none) and (pointer: coarse) {
-  :is(.option:is(:hover,:active,:focus-visible), .sub-list[active] > .option)::after {
+  :is(.option:is(:hover,:active,:focus-visible), .sub-list[data-open] > .option)::after {
     opacity: 1;
   }
 }
@@ -253,33 +259,46 @@
 <menu-drop id="menu">
   <button>HTML-based menu :)</button>
   <ul>
-    <ul name="A nice submenu">
-      <li shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Shift+Cmd+1" }'>HTML is cool</li>
-      <li>woah fancy</li>
-    </ul>
-    <li onclick="alert('noice list bro! hehe');">noice list</li>
-    <a href="https://www.google.com">Go to Google for a Search</a>
-    <li shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Shift+Cmd+2" }' checked>Option 2</li>
-    <hr>
-    <ul name="dropdowndropdown">
-      <ul name="dropdowndropdown">
-        <li>goes on for a long time</li>
-        <ul name="dropdowndropdown">
-          <li>goes on for a long time</li>
-          <ul name="dropdowndropdown">
-            <li>goes on for a long time</li>
-            <ul name="dropdowndropdown">
-              <li>goes on for a long time</li>
-              <ul name="dropdowndropdown">
-                <li>goes on for a long time</li>
-              </ul>
-            </ul>
-          </ul>
-        </ul>
+    <li>A nice submenu
+      <ul>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Shift+Cmd+1" }'>HTML is cool</li>
+        <li>woah fancy</li>
       </ul>
-      <li>gibberish words</li>
-      <li>content to help test things</li>
-    </ul>
+    </li>
+    <li onclick="alert('noice list bro! hehe');">noice list</li>
+    <li><a href="https://www.google.com">Go to Google for a Search</a></li>
+    <li data-shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Shift+Cmd+2" }' data-checked>Option 2</li>
+    <li><hr></li>
+    <li>dropdowndropdown
+      <ul>
+        <li>goes on for a long time</li>
+        <li>dropdowndropdown
+          <ul>
+            <li>goes on for a long time</li>
+            <li>dropdowndropdown
+              <ul>
+                <li>goes on for a long time</li>
+                <li>dropdowndropdown
+                  <ul>
+                    <li>goes on for a long time</li>
+                    <li>dropdowndropdown
+                      <ul>
+                        <li>goes on for a long time</li>
+                        <li>dropdowndropdown
+                          <ul>
+                            <li>goes on for a long time</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
     <li>Really long name for testing</li>
     <li>Better responsiveness!</li>
   </ul>
@@ -306,42 +325,42 @@ class MenuDropElement extends HTMLElement {
     this.shadowRoot.addEventListener("keydown",event => {
       if (event.key == "ArrowDown"){
         event.preventDefault();
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches("[part='opener'], .list, .option")){
           var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) + 1, option = options[(index <= options.length - 1) ? index : 0];
           option.focus();
-          if (this.matches("[select]") && option.matches(".option")){
-            this.getOptions(option.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
-            option.setAttribute("checked",true);
+          if (this.matches("[data-select]") && option.matches(".option")){
+            this.getOptions(option.closest(".list")).filter(option => option.matches("[data-checked]")).forEach(option => option.removeAttribute("data-checked"));
+            option.setAttribute("data-checked","");
             this.opener.textContent = option.childNodes[0].textContent;
           }
         }
-        if (event.target.matches(".sub-list[active] > .option")) this.close(event.target.closest(".sub-list"));
+        if (event.target.matches(".sub-list[data-open] > .option")) this.close(event.target.closest(".sub-list"));
       }
       if (event.key == "ArrowUp"){
         event.preventDefault();
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches("[part='opener'], .list, .option")){
           var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) - 1, option = options[(index >= 0) ? index : options.length - 1];
           option.focus();
-          if (this.matches("[select]") && option.matches(".option")){
-            this.getOptions(option.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
-            option.setAttribute("checked",true);
+          if (this.matches("[data-select]") && option.matches(".option")){
+            this.getOptions(option.closest(".list")).filter(option => option.matches("[data-checked]")).forEach(option => option.removeAttribute("data-checked"));
+            option.setAttribute("data-checked","");
             this.opener.textContent = option.childNodes[0].textContent;
           }
         }
-        if (event.target.matches(".sub-list[active] > .option")) this.close(event.target.closest(".sub-list"));
+        if (event.target.matches(".sub-list[data-open] > .option")) this.close(event.target.closest(".sub-list"));
       }
       if (event.key == "ArrowRight" || event.key == "ArrowLeft"){
         event.preventDefault();
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches(".list")){
           var options = this.getOptions(event.target), index = options.indexOf(event.target) + 1;
           options[(index <= options.length - 1) ? index : 0].focus();
         }
       }
       if (event.key == "ArrowRight"){
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches(".sub-list > .option")){
           var subList = event.target.closest(".sub-list"), option = this.getOptions(subList.querySelector(".list"))[0];
           this.open(subList);
@@ -349,8 +368,8 @@ class MenuDropElement extends HTMLElement {
         }
       }
       if (event.key == "ArrowLeft"){
-        if (!this.matches("[active]")) return;
-        if (event.target.matches(".sub-list[active] > .option")) return this.close(event.target.closest(".sub-list"));
+        if (!this.matches("[data-open]")) return;
+        if (event.target.matches(".sub-list[data-open] > .option")) return this.close(event.target.closest(".sub-list"));
         if (event.target.matches(".sub-list > .list .option")){
           var subList = event.target.closest(".list").closest(".sub-list"), option = subList.querySelector(".option");
           this.close(subList);
@@ -358,16 +377,16 @@ class MenuDropElement extends HTMLElement {
         }
       }
       if (event.key == "Escape"){
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         event.preventDefault();
         this.close((event.target.matches(".sub-list > .list .option")) ? event.target.closest(".list").closest(".sub-list") : undefined);
         ((event.target.matches(".sub-list > .list .option")) ? event.target.closest(".list").closest(".sub-list").querySelector(".option") : this.opener).focus();
       }
       if (event.key == "Tab"){
-        if (this.matches("[active]")) event.preventDefault();
+        if (this.matches("[data-open]")) event.preventDefault();
       }
       if (event.key == "Enter"){
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches(":not(a).option")){
           event.preventDefault();
           event.target.click();
@@ -377,7 +396,7 @@ class MenuDropElement extends HTMLElement {
     });
     this.shadowRoot.addEventListener("keyup",event => {
       if (event.key == " "){
-        if (!this.matches("[active]")) return;
+        if (!this.matches("[data-open]")) return;
         if (event.target.matches(".option")){
           event.preventDefault();
           event.target.click();
@@ -395,7 +414,7 @@ class MenuDropElement extends HTMLElement {
         if (event.button == 0) this.toggle();
       }
       if (event.target.matches(".list")){
-        event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+        event.target.querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
     });
@@ -404,12 +423,12 @@ class MenuDropElement extends HTMLElement {
       if (event.target == this.shadowRoot.activeElement) return;
       if (event.target.matches(".option")) event.target.focus();
       if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
-      if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+      if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
     });
     this.shadowRoot.addEventListener("pointerup",event => {
       if (event.pointerType == "mouse") return;
       if (event.target.matches(".list")){
-        event.target.querySelectorAll(".sub-list[active]").forEach(subList => this.close(subList));
+        event.target.querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
     });
@@ -423,9 +442,9 @@ class MenuDropElement extends HTMLElement {
       }
       if (event.target.matches(".sub-list > .option")) return this[(!event.pointerType == "mouse") ? "open" : "toggle"](event.target.closest(".sub-list"));
       if (event.target.matches(".option")){
-        if (this.matches("[select]") && !event.target.matches("[disabled]")){
-          this.getOptions(event.target.closest(".list")).filter(option => option.matches("[checked]")).forEach(option => option.removeAttribute("checked"));
-          event.target.setAttribute("checked",true);
+        if (this.matches("[data-select]") && !event.target.matches("[data-disabled]")){
+          this.getOptions(event.target.closest(".list")).filter(option => option.matches("[data-checked]")).forEach(option => option.removeAttribute("data-checked"));
+          event.target.setAttribute("data-checked","");
           this.opener.textContent = event.target.childNodes[0].textContent;
         }
         this.close();
@@ -438,12 +457,12 @@ class MenuDropElement extends HTMLElement {
     this.shadowRoot.addEventListener("focusout",event => {
       window.requestAnimationFrame(() => {
         if (document.activeElement == this) return;
-        if (this.matches("[active]")) this.close();
+        if (this.matches("[data-open]")) this.close();
       });
     });
     this.container = document.createElement("div");
     this.container.part = "container";
-    this.container.setAttribute("ontouchstart",true);
+    this.container.setAttribute("ontouchstart","");
     this.opener = this.querySelector("button") || document.createElement("button");
     this.opener.part = "opener";
     this.main = this.querySelector("ul") || document.createElement("ul");
@@ -452,22 +471,25 @@ class MenuDropElement extends HTMLElement {
     this.main.classList.add("main");
     this.main.tabIndex = -1;window.requestAnimationFrame(() => this.open());
     this.main.querySelectorAll("ul").forEach(list => {
-      var subList = document.createElement("div"), option = document.createElement("li");
+      var subList = document.createElement("div"), option = list.closest("li"), opener = document.createElement("span");
+      subList.part = "sub-list";
       subList.classList.add("sub-list");
-      option.textContent = list.getAttribute("name");
+      opener.textContent = option.childNodes[0].textContent;
+      option.childNodes[0].textContent = "";
       list.part = "list";
       list.classList.add("list");
       list.tabIndex = -1;
       list.parentElement.insertBefore(subList,list);
-      subList.appendChild(option);
+      subList.appendChild(opener);
       subList.appendChild(list);//window.requestAnimationFrame(() => this.open(subList));
     });
-    this.main.querySelectorAll("li, a").forEach(option => {
+    this.main.querySelectorAll("li, a, .sub-list > span").forEach(option => {
+      if (option.querySelector(":scope > :is(a,hr,.sub-list)")) return;
       option.part = "option";
       option.classList.add("option");
       option.tabIndex = -1;
-      if (option.matches("[shortcuts]")){
-        var shortcuts = JSON.parse(option.getAttribute("shortcuts"));
+      if (option.matches("[data-shortcuts]")){
+        var shortcuts = JSON.parse(option.getAttribute("data-shortcuts"));
         if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Shift/g,"⇧").replace(/Ctrl/g,"⌃").replace(/Cmd/g,"⌘").replace(/\+/g,"");
         var shortcut = document.createElement("span");
         shortcut.part = "shortcut";
@@ -485,30 +507,35 @@ class MenuDropElement extends HTMLElement {
     this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
     this.container.appendChild(this.opener);
     this.container.appendChild(this.main);
-    if (this.matches("[select]")){
+    if (this.matches("[data-select]")){
       this.opener.style.minWidth = `${this.main.offsetWidth}px`;
-      if (this.main.querySelector(".option[checked]")) this.opener.textContent = this.main.querySelector(".option[checked]").childNodes[0].textContent;
+      if (this.main.querySelector(".option[data-checked]")) this.opener.textContent = this.main.querySelector(".option[data-checked]").childNodes[0].textContent;
     }
   }
   open(section = this){
     if (section != this){
-      section.closest(".list").querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+      section.closest(".list").querySelectorAll(".sub-list[data-open]").forEach(subList => subList.removeAttribute("data-open"));
       section.querySelector(".list").removeAttribute("style");
-      section.querySelector(".list").style[(this.getVisibility(section)) ? "left" : "right"] = "var(--list-position-x)";
+      section.querySelector(".list").classList.add([(this.getVisibility(section)) ? "left" : "right"]);
     }
-    section.setAttribute("active",true);
+    section.setAttribute("data-open","");
   }
   close(section = this){
-    if (!section.matches("[active]")) return;
-    section.removeAttribute("active");
-    ((section != this) ? section : this.main).querySelectorAll(".sub-list[active]").forEach(subList => subList.removeAttribute("active"));
+    if (!section.matches("[data-open]")) return;
+    section.removeAttribute("data-open");
+    if (section != this){
+      var list = section.querySelector(".list");
+      if (list.matches(".left")) list.classList.remove("left");
+      if (list.matches(".right")) list.classList.remove("right");
+    }
+    ((section != this) ? section : this.main).querySelectorAll(".sub-list[data-open]").forEach(subList => subList.removeAttribute("data-open"));
   }
   toggle(section = this){
-    (!section.matches("[active]")) ? this.open(section) : this.close(section);
+    (!section.matches("[data-open]")) ? this.open(section) : this.close(section);
   }
   getOptions(container = this.main){
-    var elements = container.querySelectorAll(":scope > .option, :scope > .sub-list > .option");
-    return Array.from(elements).filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[disabled]")));
+    var elements = container.querySelectorAll(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option");
+    return Array.from(elements).filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[data-disabled]")));
   }
   getVisibility(element = this.main){
     var bounds = element.getBoundingClientRect();
