@@ -95,6 +95,10 @@
   border-bottom: none;
   opacity: 0.75;
 }
+[part="body"] {
+  position: fixed;
+  z-index: 1;
+}
 .list {
   padding: var(--list-padding);
   position: absolute;
@@ -125,8 +129,26 @@
   --list-position-x: 0;
   top: 100%;
 }
-:host(:not([data-open])) .list.main {
+:host(:not([data-select]):not([data-open])) .list.main, .sub-list:not([data-open]) > .list {
+  padding: 0;
+  right: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: none;
   visibility: hidden;
+  overflow: hidden;
+}
+:host([data-select]:not([data-open])) .list.main {
+  padding-top: 0;
+  padding-bottom: 0;
+  left: 0;
+  top: 0;
+  height: 0;
+  border-top: none;
+  border-bottom: none;
+  visibility: hidden;
+  overflow: hidden;
 }
 .list.left {
   left: var(--list-position-x);
@@ -150,9 +172,6 @@
   .sub-list[data-open] > .option:not(:where(:hover,:active,:focus-visible)) {
     background: #00000030;
   }
-}
-.sub-list:not([data-open]) > .list {
-  visibility: hidden;
 }
 .sub-list > .list {
   --list-position-x: calc(100% + max(0px,var(--list-padding-x)));
@@ -329,11 +348,6 @@ class MenuDropElement extends HTMLElement {
         if (event.target.matches("[part='opener'], .list, .option")){
           var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) + 1, option = options[(index <= options.length - 1) ? index : 0];
           option.focus();
-          if (this.matches("[data-select]") && option.matches(".option")){
-            this.getOptions(option.closest(".list")).filter(option => option.matches("[data-checked]")).forEach(option => option.removeAttribute("data-checked"));
-            option.setAttribute("data-checked","");
-            this.opener.textContent = option.childNodes[0].textContent;
-          }
         }
         if (event.target.matches(".sub-list[data-open] > .option")) this.close(event.target.closest(".sub-list"));
       }
@@ -343,11 +357,6 @@ class MenuDropElement extends HTMLElement {
         if (event.target.matches("[part='opener'], .list, .option")){
           var options = this.getOptions((event.target.matches(".option")) ? event.target.closest(".list") : (event.target.matches(".list")) ? event.target : undefined), index = options.indexOf(event.target) - 1, option = options[(index >= 0) ? index : options.length - 1];
           option.focus();
-          if (this.matches("[data-select]") && option.matches(".option")){
-            this.getOptions(option.closest(".list")).filter(option => option.matches("[data-checked]")).forEach(option => option.removeAttribute("data-checked"));
-            option.setAttribute("data-checked","");
-            this.opener.textContent = option.childNodes[0].textContent;
-          }
         }
         if (event.target.matches(".sub-list[data-open] > .option")) this.close(event.target.closest(".sub-list"));
       }
@@ -414,7 +423,7 @@ class MenuDropElement extends HTMLElement {
         if (event.button == 0) this.toggle();
       }
       if (event.target.matches(".list")){
-        event.target.querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
+        event.target.querySelectorAll(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
     });
@@ -423,12 +432,12 @@ class MenuDropElement extends HTMLElement {
       if (event.target == this.shadowRoot.activeElement) return;
       if (event.target.matches(".option")) event.target.focus();
       if (event.target.matches(".sub-list > .option")) this.open(event.target.closest(".sub-list"));
-      if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
+      if (event.target.matches(":not(.sub-list) > .option")) event.target.closest(".list").querySelectorAll(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
     });
     this.shadowRoot.addEventListener("pointerup",event => {
       if (event.pointerType == "mouse") return;
       if (event.target.matches(".list")){
-        event.target.querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList));
+        event.target.querySelectorAll(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
     });
@@ -465,6 +474,8 @@ class MenuDropElement extends HTMLElement {
     this.container.setAttribute("ontouchstart","");
     this.opener = this.querySelector("button") || document.createElement("button");
     this.opener.part = "opener";
+    this.body = document.createElement("div");
+    this.body.part = "body";
     this.main = this.querySelector("ul") || document.createElement("ul");
     this.main.part = "list";
     this.main.classList.add("list");
@@ -506,29 +517,32 @@ class MenuDropElement extends HTMLElement {
     this.shadowRoot.appendChild(this.container);
     this.container.appendChild(document.querySelector("#menu_styles").content.querySelector("style").cloneNode(true));
     this.container.appendChild(this.opener);
-    this.container.appendChild(this.main);
+    this.container.appendChild(this.body);
+    this.body.appendChild(this.main);
+    this.innerHTML = "";
     if (this.matches("[data-select]")){
       this.opener.style.minWidth = `${this.main.offsetWidth}px`;
       if (this.main.querySelector(".option[data-checked]")) this.opener.textContent = this.main.querySelector(".option[data-checked]").childNodes[0].textContent;
     }
   }
   open(section = this){
-    if (section != this){
-      section.closest(".list").querySelectorAll(".sub-list[data-open]").forEach(subList => subList.removeAttribute("data-open"));
-      section.querySelector(".list").removeAttribute("style");
-      section.querySelector(".list").classList.add([(this.getVisibility(section)) ? "left" : "right"]);
+    if (section == this){
+      var bounds = this.opener.getBoundingClientRect();
+      this.body.style.left = `${bounds.left}px`;
+      this.body.style.top = `${bounds.bottom}px`;
     }
+    ((section == this) ? this.main : section.closest(".list")).querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList,false));
+    ((section == this) ? this.main : section.querySelector(".list")).classList.add((this.getVisibility(section)) ? "left" : "right");
     section.setAttribute("data-open","");
   }
-  close(section = this){
+  close(section = this,recursive = true){
+    var list = (section == this) ? this.main : section.querySelector(".list");
+    if (recursive) list.querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList,false));
     if (!section.matches("[data-open]")) return;
     section.removeAttribute("data-open");
-    if (section != this){
-      var list = section.querySelector(".list");
-      if (list.matches(".left")) list.classList.remove("left");
-      if (list.matches(".right")) list.classList.remove("right");
-    }
-    ((section != this) ? section : this.main).querySelectorAll(".sub-list[data-open]").forEach(subList => subList.removeAttribute("data-open"));
+    if (section == this) this.body.removeAttribute("style");
+    if (list.matches(".left")) list.classList.remove("left");
+    if (list.matches(".right")) list.classList.remove("right");
   }
   toggle(section = this){
     (!section.matches("[data-open]")) ? this.open(section) : this.close(section);
