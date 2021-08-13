@@ -33,7 +33,11 @@
     border: solid transparent;
     border-width: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     overflow: auto;
-  }
+  }/*
+  #menu {
+    position: absolute;
+    right: 24px;
+  }*/
 </style>
 
 <template id="menu_styles">
@@ -530,6 +534,7 @@ class MenuDropElement extends HTMLElement {
       var bounds = this.opener.getBoundingClientRect();
       this.body.style.left = `${bounds.left}px`;
       this.body.style.top = `${bounds.bottom}px`;
+      this.body.style.width = `${bounds.width}px`;
     }
     ((section == this) ? this.main : section.closest(".list")).querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList,false));
     ((section == this) ? this.main : section.querySelector(".list")).classList.add((this.getVisibility(section)) ? "left" : "right");
