@@ -33,11 +33,7 @@
     border: solid transparent;
     border-width: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     overflow: auto;
-  }/*
-  #menu {
-    position: absolute;
-    right: 24px;
-  }*/
+  }
 </style>
 
 <template id="menu_styles">
@@ -48,16 +44,6 @@
   padding: 0;
   box-sizing: border-box;
   touch-action: manipulation;
-}
-:host {
-  --list-padding: max(0px,var(--list-padding-y)) max(0px,var(--list-padding-x));
-  --list-padding-x: 8px;
-  --list-padding-y: 8px;
-  --list-option-padding: max(0px,var(--list-option-padding-y)) max(0px,var(--list-option-padding-x));
-  --list-option-padding-x: var(--list-padding-x);
-  --list-option-padding-y: calc(var(--list-padding-y) * 0.5);
-  --list-border-width: 1px;
-  --list-border-radius: 8px;
 }
 :host {
   position: relative;
@@ -74,20 +60,29 @@
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
+:host {
+  --list-padding: max(0px,var(--list-padding-y)) max(0px,var(--list-padding-x));
+  --list-padding-x: 8px;
+  --list-padding-y: 8px;
+  --list-border-width: 1px;
+  --list-border-radius: 8px;
+  --option-padding: max(0px,var(--option-padding-y)) max(0px,var(--option-padding-x));
+  --option-padding-x: var(--list-padding-x);
+  --option-padding-y: calc(var(--list-padding-y) * 0.5);
+}
 [part="container"] {
   display: flex;
   flex-direction: column;
 }
 [part="opener"] {
-  padding: var(--list-option-padding);
+  padding: var(--option-padding);
   display: flex;
-  gap: var(--list-option-padding-x);
+  gap: var(--option-padding-x);
   align-items: center;
   color: inherit;
   font: inherit;
   background: #cccccc;
   border: 1px solid #000000;
-  //box-shadow: 0 20px 0 20px black;
 }
 :host([data-select]) [part="opener"]::after {
   content: "";
@@ -169,12 +164,12 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .sub-list[data-open] > .option:not(:where(:hover:focus,:active,:focus-visible)) {
-    background: #00000030;
+    background-color: #00000030;
   }
 }
 @media (hover: none) and (pointer: coarse) {
   .sub-list[data-open] > .option:not(:where(:hover,:active,:focus-visible)) {
-    background: #00000030;
+    background-color: #00000030;
   }
 }
 .sub-list > .list {
@@ -183,9 +178,9 @@
   top: calc(calc(max(0px,var(--list-padding-y)) + max(0px,var(--list-border-width))) * -1);
 }
 .option {
-  padding: var(--list-option-padding);
+  padding: var(--option-padding);
   display: flex;
-  gap: calc(var(--list-option-padding-x) * 3);
+  gap: calc(var(--option-padding-x) * 3);
   align-items: center;
   color: inherit;
   border-radius: calc(var(--list-border-radius) / 2);
@@ -194,19 +189,19 @@
 @media (hover: hover) and (pointer: fine) {
   .option:where(:hover:focus,:active,:focus-visible) {
     color: #eeeeee;
-    background: #0763d5;
+    background-color: #0763d5;
   }
 }
 @media (hover: none) and (pointer: coarse) {
   .option:where(:hover,:active,:focus-visible) {
     color: #eeeeee;
-    background: #0763d5;
+    background-color: #0763d5;
   }
 }
 :host([data-select]) .option::before {
   content: "✓";
-  margin-left: calc(var(--list-option-padding-x) * -0.5);
-  margin-right: calc(var(--list-option-padding-x) * -2.25);
+  margin-left: calc(var(--option-padding-x) * -0.5);
+  margin-right: calc(var(--option-padding-x) * -2.25);
 }
 :host([data-select]) .option:not([data-checked])::before {
   visibility: hidden;
@@ -236,9 +231,6 @@
 :host([data-select]) .shortcut {
   display: none;
 }
-:focus {
-  outline: 2px dashed orange;
-}
 .sub-list > .option::after {
   content: "";
   margin-left: auto;
@@ -260,7 +252,7 @@
   }
 }
 .divider {
-  margin: var(--list-option-padding);
+  margin: var(--option-padding);
   height: 1px;
   color: inherit;
   background: currentColor;
@@ -484,7 +476,7 @@ class MenuDropElement extends HTMLElement {
     this.main.part = "list";
     this.main.classList.add("list");
     this.main.classList.add("main");
-    this.main.tabIndex = -1;window.requestAnimationFrame(() => this.open());
+    this.main.tabIndex = -1;//window.requestAnimationFrame(() => this.open());
     this.main.querySelectorAll("ul").forEach(list => {
       var subList = document.createElement("div"), option = list.closest("li"), opener = document.createElement("span");
       subList.part = "sub-list";
