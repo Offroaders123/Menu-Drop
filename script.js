@@ -169,6 +169,7 @@ class MenuDropElement extends HTMLElement {
         option.part = "option";
         option.classList.add("option");
         option.tabIndex = -1;
+        if (option.matches("[data-icon]")) option.style.setProperty("--option-icon-image",`url("${new URL(option.getAttribute("data-icon"),document.baseURI).href}")`);
         if (option.matches("[data-shortcuts]")){
           var shortcuts = JSON.parse(option.getAttribute("data-shortcuts"));
           if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Ctrl/g,"⌃").replace(/Option/g,"⌥").replace(/Shift/g,"⇧").replace(/Cmd/g,"⌘").replace(/\+/g,"");
@@ -191,7 +192,7 @@ class MenuDropElement extends HTMLElement {
       this.body.appendChild(this.main);
       this.innerHTML = "";
       if (this.matches("[data-select]")){
-        this.opener.style.minWidth = `${this.main.offsetWidth}px`;
+        new ResizeObserver(() => this.opener.style.minWidth = `${this.main.offsetWidth}px`).observe(this.main);
         if (!this.matches("[data-select='no-rename']") && this.main.querySelector(".option[data-selected]")) this.opener.textContent = this.main.querySelector(".option[data-selected]").childNodes[0].textContent;
       }
     });
@@ -199,8 +200,8 @@ class MenuDropElement extends HTMLElement {
   open(section = this){
     if (section == this){
       var bounds = this.opener.getBoundingClientRect();
-      this.body.style.left = `calc(${bounds.left - parseInt(window.getComputedStyle(this).getPropertyValue("--safe-area-inset-left")) + window.visualViewport.offsetLeft}px + var(--safe-area-inset-left))`;
-      this.body.style.top = `calc(${bounds.bottom - parseInt(window.getComputedStyle(this).getPropertyValue("--safe-area-inset-top")) + window.visualViewport.offsetTop}px + var(--safe-area-inset-top))`;
+      this.body.style.left = `calc(${bounds.left - parseInt(window.getComputedStyle(this).getPropertyValue("--safe-area-inset-left")) + ((CSS.supports("-webkit-touch-callout: none")) ? window.visualViewport.offsetLeft : 0)}px + var(--safe-area-inset-left))`;
+      this.body.style.top = `calc(${bounds.bottom - parseInt(window.getComputedStyle(this).getPropertyValue("--safe-area-inset-top")) + ((CSS.supports("-webkit-touch-callout: none")) ? window.visualViewport.offsetTop : 0)}px + var(--safe-area-inset-top))`;
       this.body.style.width = `${bounds.width}px`;
     }
     ((section == this) ? this.main : section.closest(".list")).querySelectorAll(".sub-list[data-open]").forEach(subList => this.close(subList,false));

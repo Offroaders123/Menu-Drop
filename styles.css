@@ -144,10 +144,18 @@
     }
   }
 }
+:host(:not([data-select])) .list[data-show-icons] > .option::before,
+:host(:not([data-select])) .list[data-show-icons] > li:not(.option) > .option::before,
+:host(:not([data-select])) .list[data-show-icons] > li:not(.option) > .sub-list > .option::before {
+  content: "";
+  margin-right: calc(var(--option-gap) * -1 + var(--option-padding-x));
+  width: 16px;
+  height: 16px;
+  background-image: var(--option-icon-image);
+}
 :host([data-select]) .option::before {
   content: "✓";
-  margin-left: calc(var(--selected-icon-width) / -1);
-  margin-right: calc(var(--option-gap) * -1 + var(--selected-icon-width));
+  margin-right: calc(var(--option-gap) * -1 + var(--option-padding-x) / 2);
   width: var(--selected-icon-width);
   --selected-icon-width: 1ch;
   display: flex;
@@ -163,7 +171,6 @@
 }
 .shortcut {
   margin-left: auto;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
   opacity: 0.7;
   --shortcut-opacity-interact: 1;
   pointer-events: none;
