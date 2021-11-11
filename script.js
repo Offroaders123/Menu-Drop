@@ -204,7 +204,7 @@ class MenuDropElement extends HTMLElement {
           var shortcut = document.createElement("span");
           shortcut.part.add("shortcut");
           shortcut.classList.add("shortcut");
-          shortcut.textContent = shortcuts[(/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "macOS" in shortcuts) ? "macOS" : "default"];
+          shortcut.textContent = shortcuts[(/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && "macOS" in shortcuts) ? "macOS" : "default"];
           option.appendChild(shortcut);
         }
         if (option.matches("[onclick]")) option.setAttribute("onclick",`window.setTimeout(${option.onclick});`);
