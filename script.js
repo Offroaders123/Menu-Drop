@@ -200,7 +200,7 @@ class MenuDropElement extends HTMLElement {
         option.tabIndex = -1;
         if (option.matches("[data-shortcuts]")){
           var shortcuts = JSON.parse(option.getAttribute("data-shortcuts"));
-          if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Ctrl/g,"⌃").replace(/Option/g,"⌥").replace(/Shift/g,"⇧").replace(/Cmd/g,"⌘").replace(/\+/g,"");
+          if ("macOS" in shortcuts) shortcuts.macOS = shortcuts.macOS.replace(/Ctrl/g,"⌃").replace(/Option/g,"⌥").replace(/Shift/g,"⇧").replace(/Cmd/g,"⌘").replace(/Return/g,"↵").replace(/Enter/g,"⌤").replace(/\+/g,"");
           var shortcut = document.createElement("span");
           shortcut.part.add("shortcut");
           shortcut.classList.add("shortcut");
