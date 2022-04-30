@@ -5,10 +5,12 @@
 
 <title>MenuDrop</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> -->
 <!-- <base href="https://offroaders123.github.io/Menu-Drop-Component/"> -->
 <link rel="stylesheet" href="styles.css">
 <script src="script.js"></script>
+<meta name="color-scheme" content="light dark">
 
 <style media="not all">
   :root {
@@ -45,21 +47,33 @@
 
 <button>Button!</button>
 
-<menu-drop>
-  <menu-opener>Opener</menu-opener>
+<menu-drop id="temp">
+  <menu-opener>
+    <button>Opener</button>
+  </menu-opener>
   <menu-list>
     <menu-item>Item 1</menu-item>
     <menu-item>Item 2</menu-item>
     <menu-item>Item 3</menu-item>
     <menu-item>Item 4</menu-item>
-    <menu-item>Item 5
+    <menu-sub-list>
+      <menu-item>Item 5</menu-item>
       <menu-list>
         <menu-item>Item 1</menu-item>
         <menu-item>Item 2</menu-item>
         <menu-item>Item 3</menu-item>
-        <menu-item>Item 4</menu-item>
+        <menu-sub-list>
+          <menu-item>Item 4</menu-item>
+          <menu-list>
+            <menu-item>Item 1</menu-item>
+            <menu-item>Item 2</menu-item>
+            <menu-item>Item 3</menu-item>
+            <menu-item>Item 4</menu-item>
+          </menu-list>
+        </menu-sub-list>
+        <menu-item>Item 5</menu-item>
       </menu-list>
-    </menu-item>
+    </menu-sub-list>
   </menu-list>
 </menu-drop>
 
