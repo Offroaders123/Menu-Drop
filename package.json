@@ -1,0 +1,24 @@
+{
+  "name": "menu-drop",
+  "version": "3.0.0",
+  "description": "A simple Web Component that creates fully navigable menu systems using plain HTML!",
+  "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Offroaders123/Menu-Drop-Component.git"
+  },
+  "keywords": [
+    "javascript",
+    "mobile",
+    "web-components",
+    "vanilla-javascript",
+    "desktop",
+    "menu"
+  ],
+  "author": "Brandon Bennett <offroaders123@gmail.com> (https://github.com/Offroaders123)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Offroaders123/Menu-Drop-Component/issues"
+  },
+  "homepage": "https://github.com/Offroaders123/Menu-Drop-Component#readme"
+}
