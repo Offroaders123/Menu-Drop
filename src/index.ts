@@ -1,4 +1,4 @@
-class MenuDropElement extends HTMLElement {
+export class MenuDropElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -164,15 +164,15 @@ class MenuDropElement extends HTMLElement {
   }
 
   get list() {
-    return this.querySelector(":scope > menu-list");
+    return this.querySelector<MenuListElement>(":scope > menu-list");
   }
 
   get lists() {
-    return [...this.querySelectorAll(":scope > menu-list")];
+    return [...this.querySelectorAll<MenuListElement>(":scope > menu-list")];
   }
 }
 
-class MenuOpenerElement extends HTMLElement {
+export class MenuOpenerElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -193,7 +193,7 @@ class MenuOpenerElement extends HTMLElement {
   }
 }
 
-class MenuListElement extends HTMLElement {
+export class MenuListElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -227,11 +227,11 @@ class MenuListElement extends HTMLElement {
   }
 
   get items() {
-    return [...this.querySelectorAll(":scope > menu-item, :scope > menu-sub-list > menu-item")];
+    return [...this.querySelectorAll<MenuItemElement>(":scope > menu-item, :scope > menu-sub-list > menu-item")];
   }
 
   get lists() {
-    return [...this.querySelectorAll(":scope > menu-sub-list > menu-list")];
+    return [...this.querySelectorAll<MenuListElement>(":scope > menu-sub-list > menu-list")];
   }
 
   get visibility() {
@@ -280,7 +280,7 @@ class MenuListElement extends HTMLElement {
   }
 }
 
-class MenuItemElement extends HTMLElement {
+export class MenuItemElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -303,7 +303,7 @@ class MenuItemElement extends HTMLElement {
   }
 }
 
-class MenuSubListElement extends HTMLElement {
+export class MenuSubListElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -312,11 +312,21 @@ class MenuSubListElement extends HTMLElement {
   }
 
   get opener() {
-    return this.querySelector(":scope > menu-item");
+    return this.querySelector<MenuItemElement>(":scope > menu-item");
   }
 
   get list() {
-    return this.querySelector(":scope > menu-list");
+    return this.querySelector<MenuListElement>(":scope > menu-list");
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "menu-drop": MenuDropElement;
+    "menu-opener": MenuOpenerElement;
+    "menu-list": MenuListElement;
+    "menu-item": MenuItemElement;
+    "menu-sub-list": MenuSubListElement;
   }
 }
 
