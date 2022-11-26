@@ -26,27 +26,6 @@ class ElementTemplate extends HTMLElement {
 }
 
 class MenuDropElement extends ElementTemplate {
-  get opener() {
-    return this.querySelector("menu-opener");
-  }
-  get isOpen() {
-    return this.list.isOpen;
-  }
-  get list() {
-    return this.querySelector(":scope > menu-list");
-  }
-  get lists() {
-    return [...this.querySelectorAll(":scope > menu-list")];
-  }
-  open() {
-    this.list.open();
-  }
-  close() {
-    this.list.close();
-  }
-  toggle() {
-    this.list.toggle();
-  }
   parsedCallback() {
     this.addEventListener("keydown",event => {
       // Target is essentially event.target, but it fixes it so that menu-opener is the element when the
@@ -117,6 +96,7 @@ class MenuDropElement extends ElementTemplate {
       }
 
     });
+
     this.addEventListener("keyup",event => {
       if (event.key === " "){
         if (!this.isOpen) return;
@@ -129,6 +109,7 @@ class MenuDropElement extends ElementTemplate {
         }
       }
     });
+
     this.addEventListener("pointerdown",event => {
       // This is a workaround to be able to detect the pointerType within
       // click events for browsers that don't provide the value there.
@@ -149,12 +130,14 @@ class MenuDropElement extends ElementTemplate {
         target.lists.filter(list => list.isOpen).forEach(list => list.close());
       }
     });
+
     this.addEventListener("pointermove",event => {
       if (event.target === document.activeElement) return;
       if (event.target.matches("menu-item")) event.target.focus();
       if (event.target.matches("menu-sub-list > menu-item")) event.target.subList.list.open();
       if (event.target.matches(":not(menu-sub-list) > menu-item")) event.target.list.lists.filter(list => list.isOpen).forEach(list => list.close());
     });
+
     this.addEventListener("click",event => {
       // See the pointerdown event for more info :O
       if (!("pointerType" in event)) event.pointerType = this.__pointerType__;
@@ -173,6 +156,7 @@ class MenuDropElement extends ElementTemplate {
         this.close();
       }
     });
+
     this.addEventListener("focusout",() => {
       window.requestAnimationFrame(() => {
         if (this.contains(document.activeElement)) return;
@@ -180,65 +164,56 @@ class MenuDropElement extends ElementTemplate {
       });
     });
   }
+
+  open() {
+    this.list.open();
+  }
+
+  close() {
+    this.list.close();
+  }
+
+  toggle() {
+    this.list.toggle();
+  }
+
+  get opener() {
+    return this.querySelector("menu-opener");
+  }
+
+  get isOpen() {
+    return this.list.isOpen;
+  }
+
+  get list() {
+    return this.querySelector(":scope > menu-list");
+  }
+
+  get lists() {
+    return [...this.querySelectorAll(":scope > menu-list")];
+  }
 }
 
 class MenuOpenerElement extends ElementTemplate {
-  constructor(){
-    super();
-  }
   get menu() {
     return this.closest("menu-drop");
   }
+
   get list() {
     return this.menu.list;
   }
+
   get button() {
     return this.querySelector("button");
   }
 }
 
 class MenuListElement extends ElementTemplate {
-  get items() {
-    return [...this.querySelectorAll(":scope > menu-item, :scope > menu-sub-list > menu-item")];
+  parsedCallback() {
+    this.tabIndex = "-1";
+    if (this.isOpen) this.open();
   }
-  get lists() {
-    return [...this.querySelectorAll(":scope > menu-sub-list > menu-list")];
-  }
-  get visibility() {
-    const { left, right, width } = this.getBoundingClientRect();
-    return (left >= 0 && right <= window.innerWidth - width);
-  }
-  get isMainList() {
-    return this.matches("menu-drop > menu-list");
-  }
-  get menu() {
-    return this.closest("menu-drop");
-  }
-  get isOpen() {
-    return this.matches("[open]");
-  }
-  get list() {
-    return this;
-  }
-  get currentItem() {
-    return this.items.filter(item => item === document.activeElement)[0];
-  }
-  get nextItem() {
-    const { currentItem, items } = this;
-    const index = currentItem?.index + 1;
-    return items[index <= items.length - 1 ? index : 0];
-  }
-  get previousItem() {
-    const { currentItem, items } = this;
-    const index = currentItem?.index - 1;
-    return items[index >= 0 ? index : items.length - 1];
-  }
-  get subList() {
-    return this.closest("menu-sub-list");
-  }
-  get isSubList() {
-    return this.subList ? true : false;
-  }
+
   open() {
     if (this.isMainList){
       const { left, bottom } = this.menu.opener.getBoundingClientRect();
@@ -248,6 +223,7 @@ class MenuListElement extends ElementTemplate {
     this.setAttribute("open","");
     if (this.isSubList) this.subList.setAttribute("open","");
   }
+
   close({ recursive = true } = {}) {
     if (recursive) this.lists.filter(list => list.isOpen).forEach(list => list.close());
     if (!this.isOpen) return;
@@ -255,27 +231,80 @@ class MenuListElement extends ElementTemplate {
     if (this.isMainList) this.removeAttribute("style");
     if (this.isSubList) this.subList.removeAttribute("open");
   }
+
   toggle() {
     this.isOpen ? this.close() : this.open();
   }
-  parsedCallback() {
-    this.tabIndex = "-1";
-    if (this.isOpen) this.open();
+
+  get items() {
+    return [...this.querySelectorAll(":scope > menu-item, :scope > menu-sub-list > menu-item")];
+  }
+
+  get lists() {
+    return [...this.querySelectorAll(":scope > menu-sub-list > menu-list")];
+  }
+
+  get visibility() {
+    const { left, right, width } = this.getBoundingClientRect();
+    return (left >= 0 && right <= window.innerWidth - width);
+  }
+
+  get isMainList() {
+    return this.matches("menu-drop > menu-list");
+  }
+
+  get menu() {
+    return this.closest("menu-drop");
+  }
+
+  get isOpen() {
+    return this.matches("[open]");
+  }
+
+  get list() {
+    return this;
+  }
+
+  get currentItem() {
+    return this.items.filter(item => item === document.activeElement)[0];
+  }
+
+  get nextItem() {
+    const { currentItem, items } = this;
+    const index = currentItem?.index + 1;
+    return items[index <= items.length - 1 ? index : 0];
+  }
+
+  get previousItem() {
+    const { currentItem, items } = this;
+    const index = currentItem?.index - 1;
+    return items[index >= 0 ? index : items.length - 1];
+  }
+
+  get subList() {
+    return this.closest("menu-sub-list");
+  }
+
+  get isSubList() {
+    return this.subList ? true : false;
   }
 }
 
 class MenuItemElement extends ElementTemplate {
+  parsedCallback() {
+    this.tabIndex = "-1";
+  }
+
   get list() {
     return this.closest("menu-list");
   }
+
   get index() {
     return this.list.items.indexOf(this);
   }
+
   get subList() {
     return this.closest("menu-sub-list");
-  }
-  parsedCallback() {
-    this.tabIndex = "-1";
   }
 }
 
@@ -283,6 +312,7 @@ class MenuSubListElement extends ElementTemplate {
   get opener() {
     return this.querySelector(":scope > menu-item");
   }
+
   get list() {
     return this.querySelector(":scope > menu-list");
   }
