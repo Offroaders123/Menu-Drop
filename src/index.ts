@@ -1,32 +1,10 @@
-class ElementTemplate extends HTMLElement {
-  constructor(...args) {
-    super(...args);
-    this.hasParsed = false;
-  }
-  connectedCallback() {
-    if (this.hasParsed) return;
-    const nodes = [this];
-    let node = this;
-    while (node.parentNode){
-      node = node.parentNode;
-      nodes.push(node);
-    }
-    if (nodes.some(node => node.nextSibling) || document.readyState !== "loading"){
-      if (this.parsedCallback && !this.hasParsed) this.parsedCallback();
-      this.hasParsed = true;
-    } else {
-      new MutationObserver((undefined,observer) => {
-        if (nodes.some(node => node.nextSibling) || document.readyState !== "loading"){
-          if (this.parsedCallback && !this.hasParsed) this.parsedCallback();
-          this.hasParsed = true;
-        }
-      }).observe(this,{ childList: true });
-    }
-  }
-}
+class MenuDropElement extends HTMLElement {
+  #isDefined = false;
 
-class MenuDropElement extends ElementTemplate {
-  parsedCallback() {
+  connectedCallback() {
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
+
     this.addEventListener("keydown",event => {
       // Target is essentially event.target, but it fixes it so that menu-opener is the element when the
       // inner button is focused, since the button doesn't have component methonds available to call.
@@ -194,7 +172,14 @@ class MenuDropElement extends ElementTemplate {
   }
 }
 
-class MenuOpenerElement extends ElementTemplate {
+class MenuOpenerElement extends HTMLElement {
+  #isDefined = false;
+
+  connectedCallback() {
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
+  }
+
   get menu() {
     return this.closest("menu-drop");
   }
@@ -208,8 +193,13 @@ class MenuOpenerElement extends ElementTemplate {
   }
 }
 
-class MenuListElement extends ElementTemplate {
-  parsedCallback() {
+class MenuListElement extends HTMLElement {
+  #isDefined = false;
+
+  connectedCallback() {
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
+
     this.tabIndex = "-1";
     if (this.isOpen) this.open();
   }
@@ -290,8 +280,13 @@ class MenuListElement extends ElementTemplate {
   }
 }
 
-class MenuItemElement extends ElementTemplate {
-  parsedCallback() {
+class MenuItemElement extends HTMLElement {
+  #isDefined = false;
+
+  connectedCallback() {
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
+
     this.tabIndex = "-1";
   }
 
@@ -308,7 +303,14 @@ class MenuItemElement extends ElementTemplate {
   }
 }
 
-class MenuSubListElement extends ElementTemplate {
+class MenuSubListElement extends HTMLElement {
+  #isDefined = false;
+
+  connectedCallback() {
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
+  }
+
   get opener() {
     return this.querySelector(":scope > menu-item");
   }
