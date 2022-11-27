@@ -1,61 +1,64 @@
 export class MenuDropElement extends HTMLElement {
   #isDefined = false;
+  #__pointerType__: string | null = null;
 
   connectedCallback() {
     if (this.#isDefined || !this.isConnected) return;
     this.#isDefined = true;
 
     this.addEventListener("keydown",event => {
+      if (!(event.target instanceof Element)) return;
+
       // Target is essentially event.target, but it fixes it so that menu-opener is the element when the
       // inner button is focused, since the button doesn't have component methonds available to call.
-      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener") : event.target;
+      const target = (event.target.matches("menu-opener button")) ? event.target.closest("menu-opener")! : event.target;
 
       if (event.key === "ArrowDown"){
         if (!this.isOpen) return;
         event.preventDefault();
         if (target.matches("menu-opener, menu-list, menu-item")){
-          target.list.nextItem.focus();
+          (target as MenuOpenerElement | MenuListElement | MenuItemElement).list?.nextItem.focus();
         }
       }
       if (event.key === "ArrowUp"){
         if (!this.isOpen) return;
         event.preventDefault();
         if (target.matches("menu-opener, menu-list, menu-item")){
-          target.list.previousItem.focus();
+          (target as MenuOpenerElement | MenuListElement | MenuItemElement).list?.previousItem.focus();
         }
       }
       if (event.key === "ArrowRight" || event.key === "ArrowLeft"){
         if (!this.isOpen) return;
         event.preventDefault();
         if (target.matches("menu-list")){
-          target.items[0].focus();
+          (target as MenuListElement).items[0].focus();
         }
       }
       if (event.key === "ArrowRight"){
         if (!this.isOpen) return;
         if (target.matches("menu-sub-list > menu-item")){
-          target.subList.list.open();
-          target.subList.list.items[0].focus();
+          (target as MenuItemElement).subList?.list?.open();
+          (target as MenuItemElement).subList?.list?.items[0].focus();
         }
       }
       if (event.key === "ArrowLeft"){
         if (!this.isOpen) return;
-        if (target.matches("menu-sub-list > menu-item") && target.subList.list.isOpen){
-          target.subList.list.close();
+        if (target.matches("menu-sub-list > menu-item") && (target as MenuItemElement).subList?.list?.isOpen){
+          (target as MenuItemElement).subList?.list?.close();
         }
         if (target.matches("menu-sub-list > menu-list menu-item")){
-          target.list.subList.opener.focus();
-          target.list.subList.list.close();
+          (target as MenuItemElement).list?.subList?.opener?.focus();
+          (target as MenuItemElement).list?.subList?.list?.close();
         }
       }
       if (event.key === "Escape"){
         if (!this.isOpen) return;
         event.preventDefault();
         if (target.matches("menu-sub-list > menu-list menu-item")){
-          target.subList.opener.focus();
-          target.list.close();
+          (target as MenuItemElement).subList?.opener?.focus();
+          (target as MenuItemElement).list?.close();
         } else {
-          this.opener.button.focus();
+          this.opener?.button?.focus();
           this.close();
         }
       }
@@ -66,71 +69,81 @@ export class MenuDropElement extends HTMLElement {
         if (!this.isOpen) return;
         if (target.matches("menu-item")){
           event.preventDefault();
-          target.click();
+          (target as MenuItemElement).click();
         }
         if (target.matches("menu-sub-list > menu-item")){
-          target.subList.list.items[0].focus();
+          (target as MenuItemElement).subList?.list?.items[0].focus();
         }
       }
 
     });
 
     this.addEventListener("keyup",event => {
+      if (!(event.target instanceof Element)) return;
+
       if (event.key === " "){
         if (!this.isOpen) return;
         if (event.target.matches("menu-item")){
           event.preventDefault();
-          event.target.click();
+          (event.target as MenuItemElement).click();
         }
         if (event.target.matches("menu-sub-list > menu-item")){
-          event.target.subList.list.items[0].focus();
+          (event.target as MenuItemElement).subList?.list?.items[0].focus();
         }
       }
     });
 
     this.addEventListener("pointerdown",event => {
+      if (!(event.target instanceof Element)) return;
+
       // This is a workaround to be able to detect the pointerType within
       // click events for browsers that don't provide the value there.
       // All browsers support it in Pointer Events, so I just save the
       // value as a property on the element while the event takes place.
-      this.__pointerType__ = event.pointerType;
+      this.#__pointerType__ = event.pointerType;
 
       // See the keydown event declaration for more info :)
-      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener") : event.target;
+      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
       if (event.button !== 0 || target.matches("menu-list")) event.preventDefault();
       if (target.matches("menu-opener")){
-        if (target !== document.activeElement) target.focus();
+        if (target !== document.activeElement) (target as MenuOpenerElement).focus();
         if (event.button === 0) this.toggle();
       }
       if (target.matches("menu-list")){
-        target.focus();
-        target.lists.filter(list => list.isOpen).forEach(list => list.close());
+        (target as MenuListElement).focus();
+        (target as MenuListElement).lists.filter(list => list.isOpen).forEach(list => list.close());
       }
     });
 
     this.addEventListener("pointermove",event => {
+      if (!(event.target instanceof Element)) return;
+
       if (event.target === document.activeElement) return;
-      if (event.target.matches("menu-item")) event.target.focus();
-      if (event.target.matches("menu-sub-list > menu-item")) event.target.subList.list.open();
-      if (event.target.matches(":not(menu-sub-list) > menu-item")) event.target.list.lists.filter(list => list.isOpen).forEach(list => list.close());
+      if (event.target.matches("menu-item")) (event.target as MenuItemElement).focus();
+      if (event.target.matches("menu-sub-list > menu-item")) (event.target as MenuItemElement).subList?.list?.open();
+      if (event.target.matches(":not(menu-sub-list) > menu-item")) (event.target as MenuItemElement).list?.lists.filter(list => list.isOpen).forEach(list => list.close());
     });
 
     this.addEventListener("click",event => {
+      if (!(event.target instanceof Element)) return;
+
       // See the pointerdown event for more info :O
-      if (!("pointerType" in event)) event.pointerType = this.__pointerType__;
-      delete this.__pointerType__;
+      // @ts-ignore
+      if (!("pointerType" in event)) event.pointerType = this.#__pointerType__;
+      this.#__pointerType__ = null;
 
       // See the keydown event declaration for more info :)
-      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener") : event.target;
+      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
+      // @ts-ignore
       if (target.matches("menu-opener") && event.pointerType !== "mouse"){
-        if (target !== document.activeElement) target.focus();
+        if (target !== document.activeElement) (target as MenuOpenerElement).focus();
         this.toggle();
       }
-      if (target.matches("menu-sub-list > menu-item")) target.subList.list.toggle();
+      if (target.matches("menu-sub-list > menu-item")) (target as MenuItemElement).subList?.list?.toggle();
       if (target.matches(":not(menu-sub-list) > menu-item")){
-        this.opener.focus();
+        this.opener?.focus();
         this.close();
       }
     });
@@ -206,12 +219,12 @@ export class MenuListElement extends HTMLElement {
 
   open() {
     if (this.isMainList){
-      const { left, bottom } = this.menu.opener.getBoundingClientRect();
+      const { left, bottom } = this.menu?.opener?.getBoundingClientRect() ?? {};
       this.style.left = `${left}px`;
       this.style.top = `${bottom}px`;
     }
     this.setAttribute("open","");
-    if (this.isSubList) this.subList.setAttribute("open","");
+    if (this.isSubList) this.subList?.setAttribute("open","");
   }
 
   close({ recursive = true } = {}) {
@@ -219,7 +232,7 @@ export class MenuListElement extends HTMLElement {
     if (!this.isOpen) return;
     this.removeAttribute("open");
     if (this.isMainList) this.removeAttribute("style");
-    if (this.isSubList) this.subList.removeAttribute("open");
+    if (this.isSubList) this.subList?.removeAttribute("open");
   }
 
   toggle() {
