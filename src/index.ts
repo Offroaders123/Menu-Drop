@@ -144,15 +144,15 @@ export class MenuDropElement extends HTMLElement {
   }
 
   open() {
-    this.list.open();
+    this.list?.open();
   }
 
   close() {
-    this.list.close();
+    this.list?.close();
   }
 
   toggle() {
-    this.list.toggle();
+    this.list?.toggle();
   }
 
   get opener() {
@@ -160,7 +160,7 @@ export class MenuDropElement extends HTMLElement {
   }
 
   get isOpen() {
-    return this.list.isOpen;
+    return this.list?.isOpen ?? false;
   }
 
   get list() {
@@ -185,7 +185,7 @@ export class MenuOpenerElement extends HTMLElement {
   }
 
   get list() {
-    return this.menu.list;
+    return this.menu?.list ?? null;
   }
 
   get button() {
@@ -200,7 +200,7 @@ export class MenuListElement extends HTMLElement {
     if (this.#isDefined || !this.isConnected) return;
     this.#isDefined = true;
 
-    this.tabIndex = "-1";
+    this.tabIndex = -1;
     if (this.isOpen) this.open();
   }
 
@@ -276,7 +276,7 @@ export class MenuListElement extends HTMLElement {
   }
 
   get isSubList() {
-    return this.subList ? true : false;
+    return (this.subList !== null);
   }
 }
 
@@ -287,7 +287,7 @@ export class MenuItemElement extends HTMLElement {
     if (this.#isDefined || !this.isConnected) return;
     this.#isDefined = true;
 
-    this.tabIndex = "-1";
+    this.tabIndex = -1;
   }
 
   get list() {
@@ -295,7 +295,7 @@ export class MenuItemElement extends HTMLElement {
   }
 
   get index() {
-    return this.list.items.indexOf(this);
+    return this.list?.items.indexOf(this) ?? 0;
   }
 
   get subList() {
