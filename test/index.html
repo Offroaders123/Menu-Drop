@@ -6,36 +6,16 @@
 <title>MenuDrop</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> -->
-<!-- <base href="https://offroaders123.github.io/Menu-Drop-Component/"> -->
-<link rel="stylesheet" href="../src/style.css">
-<script type="module" src="../dist/index.js"></script>
 <meta name="color-scheme" content="light dark">
 
-<style media="not all">
-  :root {
-    --safe-area-inset-left: env(safe-area-inset-left,0px);
-    --safe-area-inset-right: env(safe-area-inset-right,0px);
-    --safe-area-inset-top: env(safe-area-inset-top,0px);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
-  }
-  html {
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-  }
+<link rel="stylesheet" href="../src/style.css">
+<script type="module" src="../dist/index.js"></script>
+
+<style>
   body {
     margin: 0;
-    padding: 0 24px;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
+    padding: 0 18px;
     font-family: sans-serif;
-    border: solid transparent;
-    border-width: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-    overflow: auto;
-    touch-action: manipulation;
   }
 </style>
 
@@ -47,7 +27,7 @@
 
 <button>Button!</button>
 
-<menu-drop id="temp">
+<menu-drop>
   <menu-opener>
     <button>Opener</button>
   </menu-opener>
