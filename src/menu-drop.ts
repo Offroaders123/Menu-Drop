@@ -1,6 +1,6 @@
-import { MenuOpenerElement } from "./MenuOpenerElement.js";
-import { MenuListElement } from "./MenuListElement.js";
-import { MenuItemElement } from "./MenuItemElement.js";
+import { MenuOpenerElement } from "./menu-opener.js";
+import { MenuListElement } from "./menu-list.js";
+import { MenuItemElement } from "./menu-item.js";
 
 export class MenuDropElement extends HTMLElement {
   #isDefined = false;

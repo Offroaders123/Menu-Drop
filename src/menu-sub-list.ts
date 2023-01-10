@@ -1,5 +1,5 @@
-import type { MenuListElement } from "./MenuListElement.js";
-import type { MenuItemElement } from "./MenuItemElement.js";
+import type { MenuListElement } from "./menu-list.js";
+import type { MenuItemElement } from "./menu-item.js";
 
 export class MenuSubListElement extends HTMLElement {
   #isDefined = false;
