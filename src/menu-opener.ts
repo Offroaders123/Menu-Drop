@@ -1,4 +1,4 @@
-export class MenuOpenerElement extends HTMLElement {
+export class MenuOpener extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -21,8 +21,8 @@ export class MenuOpenerElement extends HTMLElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "menu-opener": MenuOpenerElement;
+    "menu-opener": MenuOpener;
   }
 }
 
-window.customElements.define("menu-opener",MenuOpenerElement);
+window.customElements.define("menu-opener",MenuOpener);

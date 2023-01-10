@@ -1,7 +1,7 @@
-import type { MenuListElement } from "./menu-list.js";
-import type { MenuItemElement } from "./menu-item.js";
+import type { MenuList } from "./menu-list.js";
+import type { MenuItem } from "./menu-item.js";
 
-export class MenuSubListElement extends HTMLElement {
+export class MenuSubList extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -10,18 +10,18 @@ export class MenuSubListElement extends HTMLElement {
   }
 
   get opener() {
-    return this.querySelector<MenuItemElement>(":scope > menu-item");
+    return this.querySelector<MenuItem>(":scope > menu-item");
   }
 
   get list() {
-    return this.querySelector<MenuListElement>(":scope > menu-list");
+    return this.querySelector<MenuList>(":scope > menu-list");
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "menu-sub-list": MenuSubListElement;
+    "menu-sub-list": MenuSubList;
   }
 }
 
-window.customElements.define("menu-sub-list",MenuSubListElement);
+window.customElements.define("menu-sub-list",MenuSubList);

@@ -1,6 +1,6 @@
-import type { MenuItemElement } from "./menu-item.js";
+import type { MenuItem } from "./menu-item.js";
 
-export class MenuListElement extends HTMLElement {
+export class MenuList extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -34,11 +34,11 @@ export class MenuListElement extends HTMLElement {
   }
 
   get items() {
-    return [...this.querySelectorAll<MenuItemElement>(":scope > menu-item, :scope > menu-sub-list > menu-item")];
+    return [...this.querySelectorAll<MenuItem>(":scope > menu-item, :scope > menu-sub-list > menu-item")];
   }
 
   get lists() {
-    return [...this.querySelectorAll<MenuListElement>(":scope > menu-sub-list > menu-list")];
+    return [...this.querySelectorAll<MenuList>(":scope > menu-sub-list > menu-list")];
   }
 
   get visibility() {
@@ -89,8 +89,8 @@ export class MenuListElement extends HTMLElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "menu-list": MenuListElement;
+    "menu-list": MenuList;
   }
 }
 
-window.customElements.define("menu-list",MenuListElement);
+window.customElements.define("menu-list",MenuList);
