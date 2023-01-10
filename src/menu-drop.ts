@@ -1,6 +1,6 @@
-import { MenuOpener } from "./menu-opener.js";
-import { MenuList } from "./menu-list.js";
-import { MenuItem } from "./menu-item.js";
+import MenuOpener from "./menu-opener.js";
+import MenuList from "./menu-list.js";
+import MenuItem from "./menu-item.js";
 
 export class MenuDrop extends HTMLElement {
   #isDefined = false;
@@ -189,10 +189,12 @@ export class MenuDrop extends HTMLElement {
   }
 }
 
+window.customElements.define("menu-drop",MenuDrop);
+
 declare global {
   interface HTMLElementTagNameMap {
     "menu-drop": MenuDrop;
   }
 }
 
-window.customElements.define("menu-drop",MenuDrop);
+export default MenuDrop;

@@ -19,10 +19,12 @@ export class MenuOpener extends HTMLElement {
   }
 }
 
+window.customElements.define("menu-opener",MenuOpener);
+
 declare global {
   interface HTMLElementTagNameMap {
     "menu-opener": MenuOpener;
   }
 }
 
-window.customElements.define("menu-opener",MenuOpener);
+export default MenuOpener;

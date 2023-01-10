@@ -1,5 +1,5 @@
-import type { MenuList } from "./menu-list.js";
-import type { MenuItem } from "./menu-item.js";
+import type MenuList from "./menu-list.js";
+import type MenuItem from "./menu-item.js";
 
 export class MenuSubList extends HTMLElement {
   #isDefined = false;
@@ -18,10 +18,12 @@ export class MenuSubList extends HTMLElement {
   }
 }
 
+window.customElements.define("menu-sub-list",MenuSubList);
+
 declare global {
   interface HTMLElementTagNameMap {
     "menu-sub-list": MenuSubList;
   }
 }
 
-window.customElements.define("menu-sub-list",MenuSubList);
+export default MenuSubList;

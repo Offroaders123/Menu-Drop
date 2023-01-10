@@ -21,10 +21,12 @@ export class MenuItem extends HTMLElement {
   }
 }
 
+window.customElements.define("menu-item",MenuItem);
+
 declare global {
   interface HTMLElementTagNameMap {
     "menu-item": MenuItem;
   }
 }
 
-window.customElements.define("menu-item",MenuItem);
+export default MenuItem;

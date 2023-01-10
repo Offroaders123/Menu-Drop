@@ -1,4 +1,4 @@
-import type { MenuItem } from "./menu-item.js";
+import type MenuItem from "./menu-item.js";
 
 export class MenuList extends HTMLElement {
   #isDefined = false;
@@ -87,10 +87,12 @@ export class MenuList extends HTMLElement {
   }
 }
 
+window.customElements.define("menu-list",MenuList);
+
 declare global {
   interface HTMLElementTagNameMap {
     "menu-list": MenuList;
   }
 }
 
-window.customElements.define("menu-list",MenuList);
+export default MenuList;
