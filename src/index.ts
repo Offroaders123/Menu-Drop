@@ -16,37 +16,37 @@ export class MenuDropElement extends HTMLElement {
       if (event.key === "ArrowDown"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches("menu-opener, menu-list, menu-item")){
-          (target as MenuOpenerElement | MenuListElement | MenuItemElement).list?.nextItem.focus();
+        if (target instanceof MenuOpenerElement || target instanceof MenuListElement || target instanceof MenuItemElement){
+          target.list?.nextItem.focus();
         }
       }
       if (event.key === "ArrowUp"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches("menu-opener, menu-list, menu-item")){
-          (target as MenuOpenerElement | MenuListElement | MenuItemElement).list?.previousItem.focus();
+        if (target instanceof MenuOpenerElement || target instanceof MenuListElement || target instanceof MenuItemElement){
+          target.list?.previousItem.focus();
         }
       }
       if (event.key === "ArrowRight" || event.key === "ArrowLeft"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches("menu-list") && target instanceof MenuListElement){
+        if (target instanceof MenuListElement){
           target.items[0].focus();
         }
       }
       if (event.key === "ArrowRight"){
         if (!this.isOpen) return;
-        if (target.matches("menu-sub-list > menu-item") && target instanceof MenuItemElement){
+        if (target instanceof MenuItemElement && target.matches("menu-sub-list > :scope")){
           target.subList?.list?.open();
           target.subList?.list?.items[0].focus();
         }
       }
       if (event.key === "ArrowLeft"){
         if (!this.isOpen) return;
-        if (target.matches("menu-sub-list > menu-item") && target instanceof MenuItemElement && target.subList?.list?.isOpen){
+        if (target instanceof MenuItemElement && target.matches("menu-sub-list > :scope") && target.subList?.list?.isOpen){
           target.subList?.list?.close();
         }
-        if (target.matches("menu-sub-list > menu-list menu-item") && target instanceof MenuItemElement){
+        if (target instanceof MenuItemElement && target.matches("menu-sub-list > menu-list :scope")){
           target.list?.subList?.opener?.focus();
           target.list?.subList?.list?.close();
         }
@@ -54,7 +54,7 @@ export class MenuDropElement extends HTMLElement {
       if (event.key === "Escape"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches("menu-sub-list > menu-list menu-item") && target instanceof MenuItemElement){
+        if (target instanceof MenuItemElement && target.matches("menu-sub-list > menu-list :scope")){
           target.subList?.opener?.focus();
           target.list?.close();
         } else {
@@ -67,11 +67,11 @@ export class MenuDropElement extends HTMLElement {
       }
       if (event.key === "Enter"){
         if (!this.isOpen) return;
-        if (target.matches("menu-item") && target instanceof MenuItemElement){
+        if (target instanceof MenuItemElement){
           event.preventDefault();
           target.click();
         }
-        if (target.matches("menu-sub-list > menu-item") && target instanceof MenuItemElement){
+        if (target instanceof MenuItemElement && target.matches("menu-sub-list > :scope")){
           target.subList?.list?.items[0].focus();
         }
       }
@@ -83,11 +83,11 @@ export class MenuDropElement extends HTMLElement {
 
       if (event.key === " "){
         if (!this.isOpen) return;
-        if (event.target.matches("menu-item") && event.target instanceof MenuItemElement){
+        if (event.target instanceof MenuItemElement){
           event.preventDefault();
           event.target.click();
         }
-        if (event.target.matches("menu-sub-list > menu-item") && event.target instanceof MenuItemElement){
+        if (event.target instanceof MenuItemElement && event.target.matches("menu-sub-list > :scope")){
           event.target.subList?.list?.items[0].focus();
         }
       }
@@ -106,11 +106,11 @@ export class MenuDropElement extends HTMLElement {
       const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
       if (event.button !== 0 || target.matches("menu-list")) event.preventDefault();
-      if (target.matches("menu-opener") && target instanceof MenuOpenerElement){
+      if (target instanceof MenuOpenerElement){
         if (target !== document.activeElement) target.focus();
         if (event.button === 0) this.toggle();
       }
-      if (target.matches("menu-list") && target instanceof MenuListElement){
+      if (target instanceof MenuListElement){
         target.focus();
         target.lists.filter(list => list.isOpen).forEach(list => list.close());
       }
@@ -120,9 +120,9 @@ export class MenuDropElement extends HTMLElement {
       if (!(event.target instanceof Element)) return;
 
       if (event.target === document.activeElement) return;
-      if (event.target.matches("menu-item") && event.target instanceof MenuItemElement) event.target.focus();
-      if (event.target.matches("menu-sub-list > menu-item") && event.target instanceof MenuItemElement) event.target.subList?.list?.open();
-      if (event.target.matches(":not(menu-sub-list) > menu-item") && event.target instanceof MenuItemElement) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
+      if (event.target instanceof MenuItemElement) event.target.focus();
+      if (event.target instanceof MenuItemElement && event.target.matches("menu-sub-list > :scope")) event.target.subList?.list?.open();
+      if (event.target instanceof MenuItemElement && event.target.matches(":not(menu-sub-list) > :scope")) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
     });
 
     this.addEventListener("click",event => {
@@ -137,12 +137,12 @@ export class MenuDropElement extends HTMLElement {
       const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
       // @ts-ignore
-      if (target.matches("menu-opener") && target instanceof MenuOpenerElement && event.pointerType !== "mouse"){
+      if (target instanceof MenuOpenerElement && event.pointerType !== "mouse"){
         if (target !== document.activeElement) target.focus();
         this.toggle();
       }
-      if (target.matches("menu-sub-list > menu-item") && target instanceof MenuItemElement) target.subList?.list?.toggle();
-      if (target.matches(":not(menu-sub-list) > menu-item")){
+      if (target instanceof MenuItemElement && target.matches("menu-sub-list > :scope")) target.subList?.list?.toggle();
+      if (target instanceof MenuItemElement && target.matches(":not(menu-sub-list) > :scope")){
         this.opener?.focus();
         this.close();
       }
