@@ -1,0 +1,8 @@
+{
+  "name": "menu-drop",
+  "version": "1.0.0",
+  "types": "./types/script.d.ts",
+  "devDependencies": {
+    "new-javascript": "^0.1.14"
+  }
+}
