@@ -2,14 +2,6 @@ import MenuOpener from "./menu-opener.js";
 import MenuList from "./menu-list.js";
 import MenuItem from "./menu-item.js";
 
-const stylesheet = new CSSStyleSheet();
-
-fetch(new URL("../src/style.css",import.meta.url)).then(async response => {
-  const result = await response.text();
-  stylesheet.replaceSync(result);
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets,stylesheet];
-});
-
 export class MenuDrop extends HTMLElement {
   #isDefined = false;
   #__pointerType__: string | null = null;

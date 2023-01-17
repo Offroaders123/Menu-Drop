@@ -1,4 +1,6 @@
-import "https://cdn.jsdelivr.net/npm/construct-style-sheets-polyfill@3.1.0/dist/adoptedStyleSheets.min.js";
+import stylesheet from "../style.css" assert { type: "css" };
+
+document.adoptedStyleSheets = [...document.adoptedStyleSheets,stylesheet];
 
 export * from "./menu-drop.js";
 export * from "./menu-opener.js";
