@@ -47,7 +47,7 @@ export class MenuList extends HTMLElement {
   }
 
   get isMainList() {
-    return this.matches("menu-drop > menu-list");
+    return this.matches<MenuList>("menu-drop > menu-list");
   }
 
   get menu() {
@@ -55,7 +55,7 @@ export class MenuList extends HTMLElement {
   }
 
   get isOpen() {
-    return this.matches("[open]");
+    return this.matches<MenuList>("[open]");
   }
 
   get list() {

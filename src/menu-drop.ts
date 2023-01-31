@@ -15,42 +15,42 @@ export class MenuDrop extends HTMLElement {
 
       // Target is essentially event.target, but it fixes it so that menu-opener is the element when the
       // inner button is focused, since the button doesn't have component methonds available to call.
-      const target = (event.target.matches("menu-opener button")) ? event.target.closest("menu-opener")! : event.target;
+      const target = (event.target.matches<HTMLButtonElement>("menu-opener button")) ? event.target.closest("menu-opener")! : event.target;
 
       if (event.key === "ArrowDown"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target instanceof MenuOpener || target instanceof MenuList || target instanceof MenuItem){
+        if (target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
           target.list?.nextItem.focus();
         }
       }
       if (event.key === "ArrowUp"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target instanceof MenuOpener || target instanceof MenuList || target instanceof MenuItem){
+        if (target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
           target.list?.previousItem.focus();
         }
       }
       if (event.key === "ArrowRight" || event.key === "ArrowLeft"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target instanceof MenuList){
+        if (target.matches("menu-list")){
           target.items[0].focus();
         }
       }
       if (event.key === "ArrowRight"){
         if (!this.isOpen) return;
-        if (target instanceof MenuItem && target.matches("menu-sub-list > :scope")){
+        if (target.matches<MenuItem>("menu-sub-list > menu-item")){
           target.subList?.list?.open();
           target.subList?.list?.items[0].focus();
         }
       }
       if (event.key === "ArrowLeft"){
         if (!this.isOpen) return;
-        if (target instanceof MenuItem && target.matches("menu-sub-list > :scope") && target.subList?.list?.isOpen){
+        if (target.matches<MenuItem>("menu-sub-list > menu-item") && target.subList?.list?.isOpen){
           target.subList?.list?.close();
         }
-        if (target instanceof MenuItem && target.matches("menu-sub-list > menu-list :scope")){
+        if (target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
           target.list?.subList?.opener?.focus();
           target.list?.subList?.list?.close();
         }
@@ -58,7 +58,7 @@ export class MenuDrop extends HTMLElement {
       if (event.key === "Escape"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target instanceof MenuItem && target.matches("menu-sub-list > menu-list :scope")){
+        if (target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
           target.subList?.opener?.focus();
           target.list?.close();
         } else {
@@ -71,11 +71,11 @@ export class MenuDrop extends HTMLElement {
       }
       if (event.key === "Enter"){
         if (!this.isOpen) return;
-        if (target instanceof MenuItem){
+        if (target.matches("menu-item")){
           event.preventDefault();
           target.click();
         }
-        if (target instanceof MenuItem && target.matches("menu-sub-list > :scope")){
+        if (target.matches<MenuItem>("menu-sub-list > menu-item")){
           target.subList?.list?.items[0].focus();
         }
       }
@@ -87,11 +87,11 @@ export class MenuDrop extends HTMLElement {
 
       if (event.key === " "){
         if (!this.isOpen) return;
-        if (event.target instanceof MenuItem){
+        if (event.target.matches("menu-item")){
           event.preventDefault();
           event.target.click();
         }
-        if (event.target instanceof MenuItem && event.target.matches("menu-sub-list > :scope")){
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
           event.target.subList?.list?.items[0].focus();
         }
       }
@@ -107,14 +107,14 @@ export class MenuDrop extends HTMLElement {
       this.#__pointerType__ = event.pointerType;
 
       // See the keydown event declaration for more info :)
-      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
+      const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
       if (event.button !== 0 || target.matches("menu-list")) event.preventDefault();
-      if (target instanceof MenuOpener){
+      if (target.matches("menu-opener")){
         if (target !== document.activeElement) target.focus();
         if (event.button === 0) this.toggle();
       }
-      if (target instanceof MenuList){
+      if (target.matches("menu-list")){
         target.focus();
         target.lists.filter(list => list.isOpen).forEach(list => list.close());
       }
@@ -124,9 +124,9 @@ export class MenuDrop extends HTMLElement {
       if (!(event.target instanceof Element)) return;
 
       if (event.target === document.activeElement) return;
-      if (event.target instanceof MenuItem) event.target.focus();
-      if (event.target instanceof MenuItem && event.target.matches("menu-sub-list > :scope")) event.target.subList?.list?.open();
-      if (event.target instanceof MenuItem && event.target.matches(":not(menu-sub-list) > :scope")) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
+      if (event.target.matches("menu-item")) event.target.focus();
+      if (event.target.matches<MenuItem>("menu-sub-list > menu-item")) event.target.subList?.list?.open();
+      if (event.target.matches<MenuItem>(":not(menu-sub-list) > menu-item")) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
     });
 
     this.addEventListener("click",event => {
@@ -138,15 +138,15 @@ export class MenuDrop extends HTMLElement {
       this.#__pointerType__ = null;
 
       // See the keydown event declaration for more info :)
-      const target = event.target.matches("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
+      const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
       // @ts-ignore
-      if (target instanceof MenuOpener && event.pointerType !== "mouse"){
+      if (target.matches("menu-opener") && event.pointerType !== "mouse"){
         if (target !== document.activeElement) target.focus();
         this.toggle();
       }
-      if (target instanceof MenuItem && target.matches("menu-sub-list > :scope")) target.subList?.list?.toggle();
-      if (target instanceof MenuItem && target.matches(":not(menu-sub-list) > :scope")){
+      if (target.matches<MenuItem>("menu-sub-list > menu-item")) target.subList?.list?.toggle();
+      if (target.matches<MenuItem>(":not(menu-sub-list) > menu-item")){
         this.opener?.focus();
         this.close();
       }
