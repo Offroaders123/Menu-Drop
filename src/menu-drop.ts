@@ -3,12 +3,10 @@ import MenuList from "./menu-list.js";
 import MenuItem from "./menu-item.js";
 
 export class MenuDrop extends HTMLElement {
-  #isDefined = false;
-  #__pointerType__: string | null = null;
+  #pointerType: string | null = null;
 
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
+  constructor() {
+    super();
 
     this.addEventListener("keydown",event => {
       if (!(event.target instanceof Element)) return;
@@ -104,7 +102,7 @@ export class MenuDrop extends HTMLElement {
       // click events for browsers that don't provide the value there.
       // All browsers support it in Pointer Events, so I just save the
       // value as a property on the element while the event takes place.
-      this.#__pointerType__ = event.pointerType;
+      this.#pointerType = event.pointerType;
 
       // See the keydown event declaration for more info :)
       const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
@@ -134,8 +132,8 @@ export class MenuDrop extends HTMLElement {
 
       // See the pointerdown event for more info :O
       // @ts-ignore
-      if (!("pointerType" in event)) event.pointerType = this.#__pointerType__;
-      this.#__pointerType__ = null;
+      if (!("pointerType" in event)) event.pointerType = this.#pointerType;
+      this.#pointerType = null;
 
       // See the keydown event declaration for more info :)
       const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;

@@ -1,12 +1,8 @@
 import type MenuItem from "./menu-item.js";
 
 export class MenuList extends HTMLElement {
-  #isDefined = false;
-
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
-
+  constructor() {
+    super();
     this.tabIndex = -1;
     if (this.isOpen) this.open();
   }

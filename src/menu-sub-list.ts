@@ -2,13 +2,6 @@ import type MenuList from "./menu-list.js";
 import type MenuItem from "./menu-item.js";
 
 export class MenuSubList extends HTMLElement {
-  #isDefined = false;
-
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
-  }
-
   get opener() {
     return this.querySelector<MenuItem>(":scope > menu-item");
   }

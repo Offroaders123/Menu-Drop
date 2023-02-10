@@ -1,10 +1,6 @@
 export class MenuItem extends HTMLElement {
-  #isDefined = false;
-
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
-
+  constructor() {
+    super();
     this.tabIndex = -1;
   }
 

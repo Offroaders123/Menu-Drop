@@ -1,11 +1,4 @@
 export class MenuOpener extends HTMLElement {
-  #isDefined = false;
-
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
-  }
-
   get menu() {
     return this.closest("menu-drop");
   }
