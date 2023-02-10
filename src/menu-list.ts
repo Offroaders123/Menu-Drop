@@ -9,6 +9,8 @@ export class MenuList extends HTMLElement {
 
   open() {
     if (this.isMainList){
+      this.menu?.setAttribute("open","");
+
       const { left, bottom } = this.menu?.opener?.getBoundingClientRect() ?? {};
       this.style.left = `${left}px`;
       this.style.top = `${bottom}px`;
@@ -21,7 +23,10 @@ export class MenuList extends HTMLElement {
     if (recursive) this.lists.filter(list => list.isOpen).forEach(list => list.close());
     if (!this.isOpen) return;
     this.removeAttribute("open");
-    if (this.isMainList) this.removeAttribute("style");
+    if (this.isMainList){
+      this.removeAttribute("style");
+      this.menu?.removeAttribute("open");
+    }
     if (this.isSubList) this.subList?.removeAttribute("open");
   }
 

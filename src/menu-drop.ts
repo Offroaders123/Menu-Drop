@@ -3,7 +3,7 @@ import MenuList from "./menu-list.js";
 import MenuItem from "./menu-item.js";
 
 export class MenuDrop extends HTMLElement {
-  #pointerType: string | null = null;
+  #pointerType: typeof PointerEvent.prototype.pointerType | null = null;
 
   constructor() {
     super();
@@ -107,24 +107,38 @@ export class MenuDrop extends HTMLElement {
       // See the keydown event declaration for more info :)
       const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
 
-      if (event.button !== 0 || target.matches("menu-list")) event.preventDefault();
-      if (target.matches("menu-opener")){
-        if (target !== document.activeElement) target.focus();
-        if (event.button === 0) this.toggle();
-      }
-      if (target.matches("menu-list")){
-        target.focus();
-        target.lists.filter(list => list.isOpen).forEach(list => list.close());
+      if (event.pointerType === "mouse"){
+        if (event.button !== 0 || target.matches<MenuOpener | MenuList>("menu-opener, menu-list")) event.preventDefault();
+        if (target.matches("menu-opener")){
+          if (target !== document.activeElement) target.button?.focus();
+          if (event.button === 0) this.toggle();
+        }
+        if (target.matches("menu-list")){
+          target.focus();
+          target.lists.filter(list => list.isOpen).forEach(list => list.close());
+        }
       }
     });
 
     this.addEventListener("pointermove",event => {
       if (!(event.target instanceof Element)) return;
 
-      if (event.target === document.activeElement) return;
-      if (event.target.matches("menu-item")) event.target.focus();
-      if (event.target.matches<MenuItem>("menu-sub-list > menu-item")) event.target.subList?.list?.open();
-      if (event.target.matches<MenuItem>(":not(menu-sub-list) > menu-item")) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
+      if (event.pointerType === "mouse"){
+        if (event.target === document.activeElement) return;
+        if (event.target.matches("menu-item")) event.target.focus();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")) event.target.subList?.list?.open();
+        if (event.target.matches<MenuItem>(":not(menu-sub-list) > menu-item")) event.target.list?.lists.filter(list => list.isOpen).forEach(list => list.close());
+      }
+    });
+
+    this.addEventListener("pointerup",event => {
+      if (!(event.target instanceof HTMLElement)) return;
+      if (event.pointerType === "mouse") return;
+
+      if (event.target.matches("menu-list")){
+        event.target.focus();
+        event.target.lists.filter(list => list.isOpen).forEach(list => list.close());
+      }
     });
 
     this.addEventListener("click",event => {
@@ -145,9 +159,14 @@ export class MenuDrop extends HTMLElement {
       }
       if (target.matches<MenuItem>("menu-sub-list > menu-item")) target.subList?.list?.toggle();
       if (target.matches<MenuItem>(":not(menu-sub-list) > menu-item")){
-        this.opener?.focus();
+        this.opener?.button?.focus();
         this.close();
       }
+    });
+
+    this.addEventListener("contextmenu",event => {
+      if (!(event.target instanceof HTMLElement)) return;
+      event.preventDefault();
     });
 
     this.addEventListener("focusout",() => {
