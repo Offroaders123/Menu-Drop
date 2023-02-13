@@ -57,7 +57,7 @@ export class MenuDrop extends HTMLElement {
         if (!this.isOpen) return;
         event.preventDefault();
         if (target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
-          target.subList?.opener?.focus();
+          target.list?.subList?.opener?.focus();
           target.list?.close();
         } else {
           this.opener?.button?.focus();
