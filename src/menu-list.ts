@@ -1,5 +1,9 @@
 import type MenuItem from "./menu-item.js";
 
+export interface MenuListCloseOptions {
+  recursive?: boolean;
+}
+
 export class MenuList extends HTMLElement {
   constructor() {
     super();
@@ -9,25 +13,38 @@ export class MenuList extends HTMLElement {
 
   open() {
     if (this.isMainList){
-      this.menu?.setAttribute("open","");
-
-      const { left, bottom } = this.menu?.opener?.getBoundingClientRect() ?? {};
+      const { left, bottom } = this.menu!.opener?.getBoundingClientRect() ?? {};
       this.style.left = `${left}px`;
       this.style.top = `${bottom}px`;
+      this.menu!.setAttribute("open","");
     }
+
     this.setAttribute("open","");
-    if (this.isSubList) this.subList?.setAttribute("open","");
+
+    if (this.isSubList){
+      this.subList!.setAttribute("open","");
+    }
   }
 
-  close({ recursive = true } = {}) {
-    if (recursive) this.lists.filter(list => list.isOpen).forEach(list => list.close());
+  close({ recursive = true }: MenuListCloseOptions = {}) {
+    if (recursive){
+      for (const list of this.lists){
+        if (list.isOpen) list.close();
+      }
+    }
+
     if (!this.isOpen) return;
+
     this.removeAttribute("open");
+
     if (this.isMainList){
       this.removeAttribute("style");
-      this.menu?.removeAttribute("open");
+      this.menu!.removeAttribute("open");
     }
-    if (this.isSubList) this.subList?.removeAttribute("open");
+
+    if (this.isSubList){
+      this.subList!.removeAttribute("open");
+    }
   }
 
   toggle() {
