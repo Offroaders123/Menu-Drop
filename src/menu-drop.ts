@@ -11,54 +11,50 @@ export class MenuDrop extends HTMLElement {
     this.addEventListener("keydown",event => {
       if (!(event.target instanceof Element)) return;
 
-      // Target is essentially event.target, but it fixes it so that menu-opener is the element when the
-      // inner button is focused, since the button doesn't have component methonds available to call.
-      const target = (event.target.matches<HTMLButtonElement>("menu-opener button")) ? event.target.closest("menu-opener")! : event.target;
-
       if (event.key === "ArrowDown"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
-          target.list?.nextItem.focus();
+        if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
+          event.target.list?.nextItem.focus();
         }
       }
       if (event.key === "ArrowUp"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
-          target.list?.previousItem.focus();
+        if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
+          event.target.list?.previousItem.focus();
         }
       }
       if (event.key === "ArrowRight" || event.key === "ArrowLeft"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches("menu-list")){
-          target.items[0].focus();
+        if (event.target.matches("menu-list")){
+          event.target.items[0].focus();
         }
       }
       if (event.key === "ArrowRight"){
         if (!this.isOpen) return;
-        if (target.matches<MenuItem>("menu-sub-list > menu-item")){
-          target.subList?.list?.open();
-          target.subList?.list?.items[0].focus();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
+          event.target.subList?.list?.open();
+          event.target.subList?.list?.items[0].focus();
         }
       }
       if (event.key === "ArrowLeft"){
         if (!this.isOpen) return;
-        if (target.matches<MenuItem>("menu-sub-list > menu-item") && target.subList?.list?.isOpen){
-          target.subList?.list?.close();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item") && event.target.subList?.list?.isOpen){
+          event.target.subList?.list?.close();
         }
-        if (target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
-          target.list?.subList?.opener?.focus();
-          target.list?.subList?.list?.close();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
+          event.target.list?.subList?.opener?.focus();
+          event.target.list?.subList?.list?.close();
         }
       }
       if (event.key === "Escape"){
         if (!this.isOpen) return;
         event.preventDefault();
-        if (target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
-          target.list?.subList?.opener?.focus();
-          target.list?.close();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-list menu-item")){
+          event.target.list?.subList?.opener?.focus();
+          event.target.list?.close();
         } else {
           this.opener?.button?.focus();
           this.close();
@@ -69,12 +65,12 @@ export class MenuDrop extends HTMLElement {
       }
       if (event.key === "Enter"){
         if (!this.isOpen) return;
-        if (target.matches("menu-item")){
+        if (event.target.matches("menu-item")){
           event.preventDefault();
-          target.click();
+          event.target.click();
         }
-        if (target.matches<MenuItem>("menu-sub-list > menu-item")){
-          target.subList?.list?.items[0].focus();
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
+          event.target.subList?.list?.items[0].focus();
         }
       }
 
@@ -104,18 +100,15 @@ export class MenuDrop extends HTMLElement {
       // value as a property on the element while the event takes place.
       this.#pointerType = event.pointerType;
 
-      // See the keydown event declaration for more info :)
-      const target = event.target.matches<HTMLButtonElement>("menu-opener button") ? event.target.closest("menu-opener")! : event.target;
-
       if (event.pointerType === "mouse"){
-        if (event.button !== 0 || target.matches<MenuOpener | MenuList>("menu-opener, menu-list")) event.preventDefault();
-        if (target.matches("menu-opener")){
-          if (target !== document.activeElement) target.button?.focus();
+        if (event.button !== 0 || event.target.matches<MenuOpener | MenuList>("menu-opener, menu-list")) event.preventDefault();
+        if (event.target.matches("menu-opener")){
+          if (event.target !== document.activeElement) event.target.button?.focus();
           if (event.button === 0) this.toggle();
         }
-        if (target.matches("menu-list")){
-          target.focus();
-          target.lists.filter(list => list.isOpen).forEach(list => list.close());
+        if (event.target.matches("menu-list")){
+          event.target.focus();
+          event.target.lists.filter(list => list.isOpen).forEach(list => list.close());
         }
       }
     });

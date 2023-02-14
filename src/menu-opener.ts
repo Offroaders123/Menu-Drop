@@ -1,4 +1,20 @@
 export class MenuOpener extends HTMLElement {
+  #button = document.createElement("button");
+
+  declare readonly shadowRoot: ShadowRoot;
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open", delegatesFocus: true });
+    
+    this.#button.append(document.createElement("slot"));
+    this.shadowRoot.append(this.#button);
+  }
+
+  focus(options?: FocusOptions) {
+    this.#button.focus(options);
+  }
+
   get menu() {
     return this.closest("menu-drop");
   }
@@ -8,7 +24,7 @@ export class MenuOpener extends HTMLElement {
   }
 
   get button() {
-    return this.querySelector("button");
+    return this.#button;
   }
 }
 
