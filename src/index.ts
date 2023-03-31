@@ -6,6 +6,8 @@ type SubList = HTMLDivElement;
 type Section = MenuDropElement | SubList;
 
 class MenuDropElement extends HTMLElement {
+  static #importMetaURL = (document.currentScript! as HTMLScriptElement).src;
+
   declare defined;
   declare shadowRoot: ShadowRoot & { alternateTimeout?: number; pointerType?: string; };
 
@@ -200,7 +202,7 @@ class MenuDropElement extends HTMLElement {
       this.container.setAttribute("ontouchstart","");
       this.styles = document.createElement("link");
       this.styles.rel = "stylesheet";
-      this.styles.href = "https://offroaders123.github.io/Menu-Drop-Component/styles.css";
+      this.styles.href = `${new URL("../styles/styles.css",MenuDropElement.#importMetaURL)}`;
       this.opener = this.querySelector("button") || document.createElement("button");
       this.opener.part.add("opener");
       this.opener.classList.add("opener");

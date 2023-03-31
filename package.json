@@ -1,7 +1,9 @@
 {
   "name": "menu-drop",
   "version": "1.0.0",
-  "types": "./types/script.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "devDependencies": {
     "new-javascript": "^0.1.14"
   }

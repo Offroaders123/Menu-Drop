@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "rootDir": "./",
-    "outDir": "./types",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "module": "ESNext",
     "target": "ESNext",
     "types": [
       "new-javascript"
     ],
     "declaration": true,
-    "emitDeclarationOnly": true,
     "strict": true
   }
 }
