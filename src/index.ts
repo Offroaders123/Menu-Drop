@@ -1,9 +1,9 @@
-type Opener = HTMLButtonElement;
-type List = HTMLUListElement;
-type Option = HTMLLIElement | HTMLAnchorElement;
-type SubList = HTMLDivElement;
+type MenuDropOpener = HTMLButtonElement;
+type MenuDropList = HTMLUListElement;
+type MenuDropOption = HTMLLIElement | HTMLAnchorElement;
+type MenuDropSubList = HTMLDivElement;
 
-type Section = MenuDropElement | SubList;
+type MenuDropSection = MenuDropElement | MenuDropSubList;
 
 class MenuDropElement extends HTMLElement {
   static #importMetaURL = (document.currentScript! as HTMLScriptElement).src;
@@ -13,9 +13,9 @@ class MenuDropElement extends HTMLElement {
 
   declare container: HTMLDivElement;
   declare styles: HTMLLinkElement;
-  declare opener: Opener;
+  declare opener: MenuDropOpener;
   declare body: HTMLDivElement;
-  declare main: List;
+  declare main: MenuDropList;
 
   constructor(){
     super();
@@ -36,19 +36,19 @@ class MenuDropElement extends HTMLElement {
 
         if (event.target.matches(".opener, .list, .option")){
           var options = this.getOptions(
-            (event.target.matches<Option>(".option"))
-              ? event.target.closest<List>(".list")!
-              : (event.target.matches<List>(".list"))
+            (event.target.matches<MenuDropOption>(".option"))
+              ? event.target.closest<MenuDropList>(".list")!
+              : (event.target.matches<MenuDropList>(".list"))
               ? event.target
               : undefined
             );
-          var index = options.indexOf(event.target as Option) + 1;
+          var index = options.indexOf(event.target as MenuDropOption) + 1;
           var option = options[(index <= options.length - 1) ? index : 0];
           option.focus();
         }
 
         if (event.target.matches(".sub-list[data-open] > .option")){
-          this.close(event.target.closest<SubList>(".sub-list")!);
+          this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
       }
 
@@ -58,19 +58,19 @@ class MenuDropElement extends HTMLElement {
 
         if (event.target.matches(".opener, .list, .option")){
           var options = this.getOptions(
-            (event.target.matches<Option>(".option"))
-              ? event.target.closest<List>(".list")!
-              : (event.target.matches<List>(".list"))
+            (event.target.matches<MenuDropOption>(".option"))
+              ? event.target.closest<MenuDropList>(".list")!
+              : (event.target.matches<MenuDropList>(".list"))
               ? event.target
               : undefined
             );
-          var index = options.indexOf(event.target as Option) - 1;
+          var index = options.indexOf(event.target as MenuDropOption) - 1;
           var option = options[(index >= 0) ? index : options.length - 1];
           option.focus();
         }
 
         if (event.target.matches(".sub-list[data-open] > .option")){
-          this.close(event.target.closest<SubList>(".sub-list")!);
+          this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
       }
 
@@ -78,7 +78,7 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches<List>(".list")){
+        if (event.target.matches<MenuDropList>(".list")){
           var options = this.getOptions(event.target);
           options[0].focus();
         }
@@ -88,8 +88,8 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches(".sub-list > .option")){
-          var subList = event.target.closest<SubList>(".sub-list")!;
-          var option = this.getOptions(subList.querySelector<List>(".list")!)[0];
+          var subList = event.target.closest<MenuDropSubList>(".sub-list")!;
+          var option = this.getOptions(subList.querySelector<MenuDropList>(".list")!)[0];
           this.open(subList);
           option.focus();
         }
@@ -99,13 +99,13 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches(".sub-list[data-open] > .option")){
-          this.close(event.target.closest<SubList>(".sub-list")!);
+          this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
           return;
         }
 
         if (event.target.matches(".sub-list > .list .option")){
-          var subList = event.target.closest<List>(".list")!.closest<SubList>(".sub-list")!;
-          var option = subList.querySelector<Option>(".option")!;
+          var subList = event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!;
+          var option = subList.querySelector<MenuDropOption>(".option")!;
           this.close(subList);
           option.focus();
         }
@@ -117,12 +117,12 @@ class MenuDropElement extends HTMLElement {
 
         this.close(
           (event.target.matches(".sub-list > .list .option"))
-            ? event.target.closest<List>(".list")!.closest<SubList>(".sub-list")!
+            ? event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!
             : undefined
           );
 
         ((event.target.matches(".sub-list > .list .option"))
-          ? event.target.closest<List>(".list")!.closest<SubList>(".sub-list")!.querySelector<Option>(".option")!
+          ? event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropOption>(".option")!
           : this.opener
         ).focus();
       }
@@ -142,7 +142,7 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".sub-list > .option")){
-          this.getOptions(event.target.closest<SubList>(".sub-list")!.querySelector<List>(".list")!)[0].focus();
+          this.getOptions(event.target.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropList>(".list")!)[0].focus();
         }
       }
     });
@@ -159,7 +159,7 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".sub-list > .option")){
-          this.getOptions(event.target.closest<SubList>(".sub-list")!.querySelector<List>(".list")!)[0].focus();
+          this.getOptions(event.target.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropList>(".list")!)[0].focus();
         }
       }
     });
@@ -170,9 +170,9 @@ class MenuDropElement extends HTMLElement {
       this.shadowRoot!.pointerType = event.pointerType;
 
       if (event.pointerType != "mouse"){
-        if (event.target.matches<Opener>(".opener") && this.matches("[data-alternate]")){
+        if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
           this.shadowRoot!.alternateTimeout = window.setTimeout(() => {
-            if (event.target != this.shadowRoot!.activeElement) (event.target as Opener).focus();
+            if (event.target != this.shadowRoot!.activeElement) (event.target as MenuDropOpener).focus();
             this.toggle();
           },500);
         }
@@ -194,7 +194,7 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".list")){
-          event.target.querySelectorAll<SubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
+          event.target.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
           event.target.focus();
         }
       }
@@ -218,11 +218,11 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".sub-list > .option")){
-          this.open(event.target.closest<SubList>(".sub-list")!);
+          this.open(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
 
         if (event.target.matches(":not(.sub-list) > .option")){
-          event.target.closest<List>(".list")!.querySelectorAll<SubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
+          event.target.closest<MenuDropList>(".list")!.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         }
       }
     });
@@ -244,7 +244,7 @@ class MenuDropElement extends HTMLElement {
       if (event.pointerType == "mouse") return;
 
       if (event.target.matches(".list")){
-        event.target.querySelectorAll<SubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
+        event.target.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
     });
@@ -272,11 +272,11 @@ class MenuDropElement extends HTMLElement {
           (event.pointerType != "mouse")
             ? "open"
             : "toggle"
-          ](event.target.closest<SubList>(".sub-list")!);
+          ](event.target.closest<MenuDropSubList>(".sub-list")!);
         return;
       }
 
-      if (event.target.matches<Option>(".option")){
+      if (event.target.matches<MenuDropOption>(".option")){
         if (this.matches("[data-select]") && event.target.matches(":not([data-no-select])") && event.target.matches(":not([data-disabled])")){
           this.select(event.target);
         }
@@ -334,9 +334,9 @@ class MenuDropElement extends HTMLElement {
       this.main.classList.add("main");
       this.main.tabIndex = -1;
 
-      this.main.querySelectorAll<List>("ul").forEach(list => {
-        var subList: SubList = document.createElement("div");
-        var option = list.closest<Opener>("li")!;
+      this.main.querySelectorAll<MenuDropList>("ul").forEach(list => {
+        var subList: MenuDropSubList = document.createElement("div");
+        var option = list.closest<MenuDropOpener>("li")!;
         var opener = document.createElement("span");
 
         subList.part.add("sub-list");
@@ -355,7 +355,7 @@ class MenuDropElement extends HTMLElement {
         subList.appendChild(list);
       });
 
-      this.main.querySelectorAll<Option>("li, a, .sub-list > span").forEach(option => {
+      this.main.querySelectorAll<MenuDropOption>("li, a, .sub-list > span").forEach(option => {
         if (option.querySelector(":scope > hr")){
           option.classList.add("pass-through");
         }
@@ -433,16 +433,16 @@ class MenuDropElement extends HTMLElement {
         }).observe(this.main);
 
         if (this.main.querySelector(".option[data-selected]")){
-          this.opener.textContent = this.getTextNodes(this.main.querySelector<Option>(".option[data-selected]")!)[0].textContent;
+          this.opener.textContent = this.getTextNodes(this.main.querySelector<MenuDropOption>(".option[data-selected]")!)[0].textContent;
         }
       }
     });
   }
 
-  open(section: Section = this){
+  open(section: MenuDropSection = this){
     var list = (section == this)
       ? this.main
-      : section.querySelector<List>(".list")!;
+      : section.querySelector<MenuDropList>(".list")!;
 
     if (section == this){
       var bounds = this.opener.getBoundingClientRect();
@@ -470,8 +470,8 @@ class MenuDropElement extends HTMLElement {
       (
         (section == this)
           ? this.main
-          : section.closest<List>(".list")!
-      ).querySelectorAll<SubList>(".sub-list[data-open]")!)
+          : section.closest<MenuDropList>(".list")!
+      ).querySelectorAll<MenuDropSubList>(".sub-list[data-open]")!)
         .filter(subList => subList != list.closest(".sub-list"))
         .forEach(subList => this.close(subList,false)
     );
@@ -492,13 +492,13 @@ class MenuDropElement extends HTMLElement {
     list.part.add("open");
   }
 
-  close(section: Section = this,recursive = true){
+  close(section: MenuDropSection = this,recursive = true){
     var list = (section == this)
       ? this.main
-      : section.querySelector<List>(".list")!;
+      : section.querySelector<MenuDropList>(".list")!;
 
     if (recursive){
-      list.querySelectorAll<SubList>(".sub-list[data-open]").forEach(subList => this.close(subList,false));
+      list.querySelectorAll<MenuDropSubList>(".sub-list[data-open]").forEach(subList => this.close(subList,false));
     }
     if (!section.matches("[data-open]")) return;
 
@@ -520,13 +520,13 @@ class MenuDropElement extends HTMLElement {
     }
   }
 
-  toggle(section: Section = this){
+  toggle(section: MenuDropSection = this){
     (!section.matches("[data-open]"))
       ? this.open(section)
       : this.close(section);
   }
 
-  select(option: number | string | Option){
+  select(option: number | string | MenuDropOption){
     if (!this.matches("[data-select]")) return;
     if (!option && option != 0) return;
 
@@ -535,12 +535,12 @@ class MenuDropElement extends HTMLElement {
     }
 
     if (typeof option == "string"){
-      option = this.main.querySelector<Option>(`[data-value="${option}"]`)!;
+      option = this.main.querySelector<MenuDropOption>(`[data-value="${option}"]`)!;
     }
 
     if (!this.main.contains(option)) return;
 
-    this.getOptions(option.closest<List>(".list")!)
+    this.getOptions(option.closest<MenuDropList>(".list")!)
       .filter(option => option.matches("[data-selected]"))
       .forEach(option => option.removeAttribute("data-selected"));
 
@@ -553,8 +553,8 @@ class MenuDropElement extends HTMLElement {
     return option;
   }
 
-  getOptions(container: List = this.main): Option[] {
-    var elements = container.querySelectorAll<Option>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
+  getOptions(container: MenuDropList = this.main): MenuDropOption[] {
+    var elements = container.querySelectorAll<MenuDropOption>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
     return Array.from(elements)
       .filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[data-disabled]")));
   }
@@ -576,6 +576,10 @@ class MenuDropElement extends HTMLElement {
   blur(){
     (this.shadowRoot!.activeElement! as HTMLElement).blur();
   }
+}
+
+interface HTMLElementTagNameMap {
+  "menu-drop": MenuDropElement;
 }
 
 window.customElements.define("menu-drop",MenuDropElement);
