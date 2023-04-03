@@ -109,7 +109,8 @@
   --list-position-y: 100%;
 }
 
-:host(:not([data-select=""]):not([data-open])) .list.main, .sub-list:not([data-open]) > .list {
+:host(:not([data-select=""]):not([data-open])) .list.main,
+.sub-list:not([data-open]) > .list {
   padding: 0;
   right: 0;
   top: 50%;
@@ -145,7 +146,9 @@
   outline: none;
 }
 
-:host(:not([data-select])) .list[data-show-icons] > .option, :host(:not([data-select])) .list[data-show-icons] > li > .option, :host(:not([data-select])) .list[data-show-icons] > li > .sub-list > .option {
+:host(:not([data-select])) .list[data-show-icons] > .option,
+:host(:not([data-select])) .list[data-show-icons] > li > .option,
+:host(:not([data-select])) .list[data-show-icons] > li > .sub-list > .option {
   padding-left: calc(max(0px,var(--option-padding-x)) + max(0px,var(--option-icon-width)) + max(0px,var(--option-icon-gap)));
 }
 
@@ -211,11 +214,15 @@
   pointer-events: none;
 }
 
-.list:not([data-show-icons]) > .option > .icon, .list:not([data-show-icons]) > li > .option > .icon, .list:not([data-show-icons]) > li > .sub-list > .option > .icon {
+.list:not([data-show-icons]) > .option > .icon,
+.list:not([data-show-icons]) > li > .option > .icon,
+.list:not([data-show-icons]) > li > .sub-list > .option > .icon {
   display: none;
 }
 
-:host([data-select]) .list[data-show-icons] > .option > .icon, :host([data-select]) .list[data-show-icons] > li > .option > .icon, :host([data-select]) .list[data-show-icons] > li > .sub-list > .option > .icon {
+:host([data-select]) .list[data-show-icons] > .option > .icon,
+:host([data-select]) .list[data-show-icons] > li > .option > .icon,
+:host([data-select]) .list[data-show-icons] > li > .sub-list > .option > .icon {
   display: none;
 }
 
