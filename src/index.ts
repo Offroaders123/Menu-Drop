@@ -8,9 +8,12 @@ type MenuDropSection = MenuDropElement | MenuDropSubList;
 class MenuDropElement extends HTMLElement {
   static #importMetaURL = (document.currentScript! as HTMLScriptElement).src;
 
-  declare defined;
-  declare shadowRoot: ShadowRoot & { alternateTimeout?: number; pointerType?: string; };
+  declare readonly shadowRoot: ShadowRoot & {
+    alternateTimeout?: number;
+    pointerType?: string;
+  };
 
+  #isDefined;
   declare container: HTMLDivElement;
   declare styles: HTMLLinkElement;
   declare opener: MenuDropOpener;
@@ -19,13 +22,13 @@ class MenuDropElement extends HTMLElement {
 
   constructor(){
     super();
-    this.defined = false;
+    this.attachShadow({ mode: "open" });
+    this.#isDefined = false;
   }
 
   connectedCallback(){
-    if (this.defined || !this.isConnected) return;
-    this.defined = true;
-    this.attachShadow({ mode: "open" });
+    if (this.#isDefined || !this.isConnected) return;
+    this.#isDefined = true;
 
     this.shadowRoot.addEventListener("keydown",event => {
       if (!(event.target instanceof HTMLElement)) return;
@@ -167,12 +170,12 @@ class MenuDropElement extends HTMLElement {
     this.shadowRoot.addEventListener("pointerdown",event => {
       if (!(event.target instanceof HTMLElement)) return;
 
-      this.shadowRoot!.pointerType = event.pointerType;
+      this.shadowRoot.pointerType = event.pointerType;
 
       if (event.pointerType != "mouse"){
         if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
-          this.shadowRoot!.alternateTimeout = window.setTimeout(() => {
-            if (event.target != this.shadowRoot!.activeElement) (event.target as MenuDropOpener).focus();
+          this.shadowRoot.alternateTimeout = window.setTimeout(() => {
+            if (event.target != this.shadowRoot.activeElement) (event.target as MenuDropOpener).focus();
             this.toggle();
           },500);
         }
@@ -184,7 +187,7 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".opener") && !this.matches("[data-alternate]")){
-          if (event.target != this.shadowRoot!.activeElement){
+          if (event.target != this.shadowRoot.activeElement){
             event.target.focus();
           }
 
@@ -206,13 +209,13 @@ class MenuDropElement extends HTMLElement {
       if (event.pointerType != "mouse"){
         if (event.target.matches(".opener") && this.matches("[data-alternate]")){
           if (!("alternateTimeout" in this.shadowRoot)) return;
-          window.clearTimeout(this.shadowRoot!.alternateTimeout);
-          delete this.shadowRoot!.alternateTimeout;
+          window.clearTimeout(this.shadowRoot.alternateTimeout);
+          delete this.shadowRoot.alternateTimeout;
         }
       }
 
       if (event.pointerType == "mouse"){
-        if (event.target == this.shadowRoot!.activeElement) return;
+        if (event.target == this.shadowRoot.activeElement) return;
         if (event.target.matches(".option")){
           event.target.focus();
         }
@@ -234,8 +237,8 @@ class MenuDropElement extends HTMLElement {
       if (event.target.matches(".opener") && this.matches("[data-alternate]")){
         if (!("alternateTimeout" in this.shadowRoot)) return;
 
-        window.clearTimeout(this.shadowRoot!.alternateTimeout);
-        delete this.shadowRoot!.alternateTimeout;
+        window.clearTimeout(this.shadowRoot.alternateTimeout);
+        delete this.shadowRoot.alternateTimeout;
       }
     });
 
@@ -254,14 +257,14 @@ class MenuDropElement extends HTMLElement {
       if (!(event.target instanceof HTMLElement)) return;
 
       if (!("pointerType" in event)){
-        event.pointerType = this.shadowRoot!.pointerType;
+        event.pointerType = this.shadowRoot.pointerType;
       }
-      delete this.shadowRoot!.pointerType;
+      delete this.shadowRoot.pointerType;
 
       if (event.target.matches(".opener") && !this.matches("[data-alternate]")){
         if (event.pointerType == "mouse") return;
 
-        if (event.target != this.shadowRoot!.activeElement){
+        if (event.target != this.shadowRoot.activeElement){
           event.target.focus();
         }
         this.toggle();
@@ -293,7 +296,7 @@ class MenuDropElement extends HTMLElement {
       }
 
       if (event.target.matches(".opener") && this.matches("[data-alternate]")){
-        if (event.target != this.shadowRoot!.activeElement){
+        if (event.target != this.shadowRoot.activeElement){
           event.target.focus();
         }
         this.toggle();
@@ -416,7 +419,7 @@ class MenuDropElement extends HTMLElement {
         divider.classList.add("divider");
       });
 
-      this.shadowRoot!.appendChild(this.container);
+      this.shadowRoot.appendChild(this.container);
       this.container.appendChild(this.styles);
       this.container.appendChild(this.opener);
       this.container.appendChild(this.body);
@@ -569,12 +572,16 @@ class MenuDropElement extends HTMLElement {
       .filter(node => node.nodeType == Node.TEXT_NODE && node.textContent?.replace(/\s/g,"").length);
   }
 
-  focus({ preventScroll = false }: FocusOptions = {}){
-    this.opener.focus({ preventScroll });
+  override focus(options: FocusOptions = {}){
+    this.opener.focus(options);
   }
 
-  blur(){
-    (this.shadowRoot!.activeElement! as HTMLElement).blur();
+  override blur(){
+    (this.shadowRoot.activeElement as HTMLElement | null)?.blur?.();
+  }
+
+  get defined() {
+    return this.#isDefined;
   }
 }
 
