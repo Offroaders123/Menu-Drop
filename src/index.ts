@@ -38,15 +38,15 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches(".opener, .list, .option")){
-          var options = this.getOptions(
+          const options = this.getOptions(
             (event.target.matches<MenuDropOption>(".option"))
               ? event.target.closest<MenuDropList>(".list")!
               : (event.target.matches<MenuDropList>(".list"))
               ? event.target
               : undefined
             );
-          var index = options.indexOf(event.target as MenuDropOption) + 1;
-          var option = options[(index <= options.length - 1) ? index : 0];
+          const index = options.indexOf(event.target as MenuDropOption) + 1;
+          const option = options[(index <= options.length - 1) ? index : 0];
           option.focus();
         }
 
@@ -60,15 +60,15 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches(".opener, .list, .option")){
-          var options = this.getOptions(
+          const options = this.getOptions(
             (event.target.matches<MenuDropOption>(".option"))
               ? event.target.closest<MenuDropList>(".list")!
               : (event.target.matches<MenuDropList>(".list"))
               ? event.target
               : undefined
             );
-          var index = options.indexOf(event.target as MenuDropOption) - 1;
-          var option = options[(index >= 0) ? index : options.length - 1];
+          const index = options.indexOf(event.target as MenuDropOption) - 1;
+          const option = options[(index >= 0) ? index : options.length - 1];
           option.focus();
         }
 
@@ -82,7 +82,7 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches<MenuDropList>(".list")){
-          var options = this.getOptions(event.target);
+          const options = this.getOptions(event.target);
           options[0].focus();
         }
       }
@@ -91,8 +91,8 @@ class MenuDropElement extends HTMLElement {
         if (!this.matches("[data-open]")) return;
 
         if (event.target.matches(".sub-list > .option")){
-          var subList = event.target.closest<MenuDropSubList>(".sub-list")!;
-          var option = this.getOptions(subList.querySelector<MenuDropList>(".list")!)[0];
+          const subList = event.target.closest<MenuDropSubList>(".sub-list")!;
+          const option = this.getOptions(subList.querySelector<MenuDropList>(".list")!)[0];
           this.open(subList);
           option.focus();
         }
@@ -107,8 +107,8 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (event.target.matches(".sub-list > .list .option")){
-          var subList = event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!;
-          var option = subList.querySelector<MenuDropOption>(".option")!;
+          const subList = event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!;
+          const option = subList.querySelector<MenuDropOption>(".option")!;
           this.close(subList);
           option.focus();
         }
@@ -338,9 +338,9 @@ class MenuDropElement extends HTMLElement {
       this.main.tabIndex = -1;
 
       this.main.querySelectorAll<MenuDropList>("ul").forEach(list => {
-        var subList: MenuDropSubList = document.createElement("div");
-        var option = list.closest<MenuDropOpener>("li")!;
-        var opener = document.createElement("span");
+        const subList: MenuDropSubList = document.createElement("div");
+        const option = list.closest<MenuDropOpener>("li")!;
+        const opener = document.createElement("span");
 
         subList.part.add("sub-list");
         subList.classList.add("sub-list");
@@ -369,7 +369,7 @@ class MenuDropElement extends HTMLElement {
         option.tabIndex = -1;
 
         if (option.matches("[data-shortcuts]")){
-          var shortcuts = JSON.parse(option.getAttribute("data-shortcuts")!);
+          const shortcuts = JSON.parse(option.getAttribute("data-shortcuts")!);
 
           if ("macOS" in shortcuts){
             shortcuts.macOS = shortcuts.macOS
@@ -382,7 +382,7 @@ class MenuDropElement extends HTMLElement {
               .replace(/\+/g,"");
           }
 
-          var shortcut = document.createElement("span");
+          const shortcut = document.createElement("span");
           shortcut.part.add("shortcut");
           shortcut.classList.add("shortcut");
 
@@ -404,7 +404,7 @@ class MenuDropElement extends HTMLElement {
         }
 
         if (option.querySelector(":scope > :is(img,svg)")){
-          var icon = option.querySelector<HTMLImageElement | SVGSVGElement>(":scope > :is(img,svg)")!;
+          const icon = option.querySelector<HTMLImageElement | SVGSVGElement>(":scope > :is(img,svg)")!;
           icon.part.add("icon");
           icon.classList.add("icon");
 
@@ -443,12 +443,12 @@ class MenuDropElement extends HTMLElement {
   }
 
   open(section: MenuDropSection = this){
-    var list = (section == this)
+    const list = (section == this)
       ? this.main
       : section.querySelector<MenuDropList>(".list")!;
 
     if (section == this){
-      var bounds = this.opener.getBoundingClientRect();
+      const bounds = this.opener.getBoundingClientRect();
 
       this.body.style.left = `calc(${
         bounds.left - parseInt(window.getComputedStyle(this).getPropertyValue("--safe-area-inset-left"))
@@ -474,10 +474,11 @@ class MenuDropElement extends HTMLElement {
         (section == this)
           ? this.main
           : section.closest<MenuDropList>(".list")!
-      ).querySelectorAll<MenuDropSubList>(".sub-list[data-open]")!)
-        .filter(subList => subList != list.closest(".sub-list"))
-        .forEach(subList => this.close(subList,false)
-    );
+      )
+        .querySelectorAll<MenuDropSubList>(".sub-list[data-open]")!
+    )
+      .filter(subList => subList != list.closest(".sub-list"))
+      .forEach(subList => this.close(subList,false));
 
     list.part.add(
       (this.getVisibility(section))
@@ -496,7 +497,7 @@ class MenuDropElement extends HTMLElement {
   }
 
   close(section: MenuDropSection = this,recursive = true){
-    var list = (section == this)
+    const list = (section == this)
       ? this.main
       : section.querySelector<MenuDropList>(".list")!;
 
@@ -557,13 +558,13 @@ class MenuDropElement extends HTMLElement {
   }
 
   getOptions(container: MenuDropList = this.main): MenuDropOption[] {
-    var elements = container.querySelectorAll<MenuDropOption>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
+    const elements = container.querySelectorAll<MenuDropOption>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
     return Array.from(elements)
       .filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[data-disabled]")));
   }
 
   getVisibility(element: HTMLElement = this.main){
-    var bounds = element.getBoundingClientRect();
+    const bounds = element.getBoundingClientRect();
     return (bounds.left >= 0 && bounds.right <= window.innerWidth - bounds.width);
   }
 
