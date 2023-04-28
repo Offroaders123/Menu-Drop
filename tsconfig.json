@@ -3,7 +3,6 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "module": "ESNext",
-    "moduleResolution": "NodeNext",
     "target": "ESNext",
     "types": [
       "new-javascript"
