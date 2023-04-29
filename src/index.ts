@@ -14,10 +14,25 @@ class MenuDropElement extends HTMLElement {
   };
 
   #isDefined;
+  /**
+   * The internal wrapper for all of the element's Shadow DOM content.
+  */
   declare readonly container: HTMLDivElement;
+  /**
+   * The internal stylesheet for the element's default styles.
+  */
   declare readonly styles: HTMLLinkElement;
+  /**
+   * The top-level opener button for accessing the menu.
+  */
   declare readonly opener: MenuDropOpener;
+  /**
+   * The internal wrapper for the element's menu lists.
+  */
   declare readonly body: HTMLDivElement;
+  /**
+   * The top-level list within the menu.
+  */
   declare readonly main: MenuDropList;
 
   constructor(){
@@ -447,6 +462,11 @@ class MenuDropElement extends HTMLElement {
     });
   }
 
+  /**
+   * Opens the top-level list within the menu.
+   * 
+   * @param section This is used internally to open specific lists within the menu.
+  */
   open(section: MenuDropSection = this){
     const list = (section == this)
       ? this.main
@@ -501,7 +521,12 @@ class MenuDropElement extends HTMLElement {
     list.part.add("open");
   }
 
-  close(section: MenuDropSection = this,recursive = true){
+  /**
+   * Closes the top-level list within the menu.
+   * 
+   * @param section This is used internally to close specific lists within the menu.
+  */
+  close(section: MenuDropSection = this, recursive: boolean = true){
     const list = (section == this)
       ? this.main
       : section.querySelector<MenuDropList>(".list")!;
@@ -529,12 +554,48 @@ class MenuDropElement extends HTMLElement {
     }
   }
 
+  /**
+   * Toggles the top-level list within the menu.
+   * 
+   * @param section This is used internally to toggle specific lists within the menu.
+  */
   toggle(section: MenuDropSection = this){
     (!section.matches("[data-open]"))
       ? this.open(section)
       : this.close(section);
   }
 
+  /**
+   * Selects a given option from the top-level menu, when 'select' mode is enabled.
+   * 
+   * I never fully finished this functionality, so there's not much of a great API to work with this unfortunately.
+   * Same with the 'shortcuts' feature. It works great for what this legacy version needed to do, but it really could
+   * use a fresh start in the next update.
+   * 
+   * For these two features, if you really need to use them (I'm probably talking to myself here, lol), the most
+   * I can say is to look into the source for this legacy build, and how STE used it also. It's not even using it much
+   * there, so that's probably why I didn't smoothen it out yet. I think the technical debt for this component got
+   * pretty high for me with the last few updates too, so that didn't help with being able to add new things safely.
+   * Hence, why this whole rework is happening.
+   * 
+   * This text should probably be in the commit message for these docs, too.
+   * 
+   * ```html
+   * <!--
+   *   In the top-level opener button, the text content
+   *   will reflect the currently selected value, and a
+   *   dropdown arrow will be rendered next to it.
+   * -->
+   * <menu-drop data-select></menu-drop>
+   * 
+   * <!--
+   *   Enables 'select' mode, while rendering the
+   *   top-level opener button without any custom
+   *   functionality.
+   * -->
+   * <menu-drop data-select="no-appearance"></menu-drop>
+   * ```
+  */
   select(option: number | string | MenuDropOption){
     if (!this.matches("[data-select]")) return;
     if (!option && option != 0) return;
@@ -562,17 +623,28 @@ class MenuDropElement extends HTMLElement {
     return option;
   }
 
+  /**
+   * Returns the child options for a given list within the menu.
+  */
   getOptions(container: MenuDropList = this.main): MenuDropOption[] {
     const elements = container.querySelectorAll<MenuDropOption>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
     return Array.from(elements)
       .filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[data-disabled]")));
   }
 
+  /**
+   * Calculates if a given element within the menu is not obstructed by the viewport.
+   * 
+   * This is used internally for the list auto-wrapping behavior.
+  */
   getVisibility(element: HTMLElement = this.main){
     const bounds = element.getBoundingClientRect();
     return (bounds.left >= 0 && bounds.right <= window.innerWidth - bounds.width);
   }
 
+  /**
+   * Returns the text nodes for a given element within the menu, only if they contain more than whitespace.
+  */
   getTextNodes(element: HTMLElement){
     return Array.from(element.childNodes)
       .filter(node => node.nodeType == Node.TEXT_NODE && node.textContent?.replace(/\s/g,"").length);
