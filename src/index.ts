@@ -14,11 +14,11 @@ class MenuDropElement extends HTMLElement {
   };
 
   #isDefined;
-  declare container: HTMLDivElement;
-  declare styles: HTMLLinkElement;
-  declare opener: MenuDropOpener;
-  declare body: HTMLDivElement;
-  declare main: MenuDropList;
+  declare readonly container: HTMLDivElement;
+  declare readonly styles: HTMLLinkElement;
+  declare readonly opener: MenuDropOpener;
+  declare readonly body: HTMLDivElement;
+  declare readonly main: MenuDropList;
 
   constructor(){
     super();
@@ -313,23 +313,28 @@ class MenuDropElement extends HTMLElement {
     });
 
     window.requestAnimationFrame(() => {
+      // @ts-expect-error
       this.container = document.createElement("div");
       this.container.part.add("container");
       this.container.classList.add("container");
       this.container.setAttribute("ontouchstart","");
 
+      // @ts-expect-error
       this.styles = document.createElement("link");
       this.styles.rel = "stylesheet";
       this.styles.href = `${new URL("../styles/styles.css",MenuDropElement.#importMetaURL)}`;
 
+      // @ts-expect-error
       this.opener = this.querySelector("button") || document.createElement("button");
       this.opener.part.add("opener");
       this.opener.classList.add("opener");
 
+      // @ts-expect-error
       this.body = document.createElement("div");
       this.body.part.add("body");
       this.body.classList.add("body");
 
+      // @ts-expect-error
       this.main = this.querySelector("ul") || document.createElement("ul");
       this.main.part.add("list");
       this.main.part.add("main");
