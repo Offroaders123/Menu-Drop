@@ -52,7 +52,7 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(".opener, .list, .option")){
+        if (event.target.matches<MenuDropOpener | MenuDropList | MenuDropOption>(".opener, .list, .option")){
           const options = this.getOptions(
             (event.target.matches<MenuDropOption>(".option"))
               ? event.target.closest<MenuDropList>(".list")!
@@ -65,7 +65,7 @@ class MenuDropElement extends HTMLElement {
           option.focus();
         }
 
-        if (event.target.matches(".sub-list[data-open] > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list[data-open] > .option")){
           this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
       }
@@ -74,7 +74,7 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(".opener, .list, .option")){
+        if (event.target.matches<MenuDropOpener | MenuDropList | MenuDropOption>(".opener, .list, .option")){
           const options = this.getOptions(
             (event.target.matches<MenuDropOption>(".option"))
               ? event.target.closest<MenuDropList>(".list")!
@@ -87,7 +87,7 @@ class MenuDropElement extends HTMLElement {
           option.focus();
         }
 
-        if (event.target.matches(".sub-list[data-open] > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list[data-open] > .option")){
           this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
       }
@@ -105,7 +105,7 @@ class MenuDropElement extends HTMLElement {
       if (event.key == "ArrowRight"){
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(".sub-list > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list > .option")){
           const subList = event.target.closest<MenuDropSubList>(".sub-list")!;
           const option = this.getOptions(subList.querySelector<MenuDropList>(".list")!)[0];
           this.open(subList);
@@ -116,12 +116,12 @@ class MenuDropElement extends HTMLElement {
       if (event.key == "ArrowLeft"){
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(".sub-list[data-open] > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list[data-open] > .option")){
           this.close(event.target.closest<MenuDropSubList>(".sub-list")!);
           return;
         }
 
-        if (event.target.matches(".sub-list > .list .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list > .list .option")){
           const subList = event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!;
           const option = subList.querySelector<MenuDropOption>(".option")!;
           this.close(subList);
@@ -134,12 +134,12 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
 
         this.close(
-          (event.target.matches(".sub-list > .list .option"))
+          (event.target.matches<MenuDropOption>(".sub-list > .list .option"))
             ? event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!
             : undefined
           );
 
-        ((event.target.matches(".sub-list > .list .option"))
+        ((event.target.matches<MenuDropOption>(".sub-list > .list .option"))
           ? event.target.closest<MenuDropList>(".list")!.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropOption>(".option")!
           : this.opener
         ).focus();
@@ -154,12 +154,12 @@ class MenuDropElement extends HTMLElement {
       if (event.key == "Enter"){
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(":not(a).option")){
+        if (event.target.matches<Exclude<MenuDropOption,HTMLAnchorElement>>(":not(a).option")){
           event.preventDefault();
           event.target.click();
         }
 
-        if (event.target.matches(".sub-list > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list > .option")){
           this.getOptions(event.target.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropList>(".list")!)[0].focus();
         }
       }
@@ -171,12 +171,12 @@ class MenuDropElement extends HTMLElement {
       if (event.key == " "){
         if (!this.matches("[data-open]")) return;
 
-        if (event.target.matches(".option")){
+        if (event.target.matches<MenuDropOption>(".option")){
           event.preventDefault();
           event.target.click();
         }
 
-        if (event.target.matches(".sub-list > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list > .option")){
           this.getOptions(event.target.closest<MenuDropSubList>(".sub-list")!.querySelector<MenuDropList>(".list")!)[0].focus();
         }
       }
@@ -190,18 +190,20 @@ class MenuDropElement extends HTMLElement {
       if (event.pointerType != "mouse"){
         if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
           this.shadowRoot.alternateTimeout = window.setTimeout(() => {
-            if (event.target != this.shadowRoot.activeElement) (event.target as MenuDropOpener).focus();
+            if (event.target != this.shadowRoot.activeElement){
+              (event.target as MenuDropOpener).focus();
+            }
             this.toggle();
           },500);
         }
       }
 
       if (event.pointerType == "mouse"){
-        if ((event.button != 0 && !event.target.matches("a")) || event.target.matches(".opener, .list")){
+        if ((event.button != 0 && !event.target.matches("a")) || event.target.matches<MenuDropOpener | MenuDropList>(".opener, .list")){
           event.preventDefault();
         }
 
-        if (event.target.matches(".opener") && !this.matches("[data-alternate]")){
+        if (event.target.matches<MenuDropOpener>(".opener") && !this.matches("[data-alternate]")){
           if (event.target != this.shadowRoot.activeElement){
             event.target.focus();
           }
@@ -211,7 +213,7 @@ class MenuDropElement extends HTMLElement {
           }
         }
 
-        if (event.target.matches(".list")){
+        if (event.target.matches<MenuDropList>(".list")){
           event.target.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
           event.target.focus();
         }
@@ -222,7 +224,7 @@ class MenuDropElement extends HTMLElement {
       if (!(event.target instanceof HTMLElement)) return;
 
       if (event.pointerType != "mouse"){
-        if (event.target.matches(".opener") && this.matches("[data-alternate]")){
+        if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
           if (!("alternateTimeout" in this.shadowRoot)) return;
           window.clearTimeout(this.shadowRoot.alternateTimeout);
           delete this.shadowRoot.alternateTimeout;
@@ -231,15 +233,15 @@ class MenuDropElement extends HTMLElement {
 
       if (event.pointerType == "mouse"){
         if (event.target == this.shadowRoot.activeElement) return;
-        if (event.target.matches(".option")){
+        if (event.target.matches<MenuDropOption>(".option")){
           event.target.focus();
         }
 
-        if (event.target.matches(".sub-list > .option")){
+        if (event.target.matches<MenuDropOption>(".sub-list > .option")){
           this.open(event.target.closest<MenuDropSubList>(".sub-list")!);
         }
 
-        if (event.target.matches(":not(.sub-list) > .option")){
+        if (event.target.matches<MenuDropOption>(":not(.sub-list) > .option")){
           event.target.closest<MenuDropList>(".list")!.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         }
       }
@@ -249,7 +251,7 @@ class MenuDropElement extends HTMLElement {
       if (!(event.target instanceof HTMLElement)) return;
       if (event.pointerType == "mouse") return;
 
-      if (event.target.matches(".opener") && this.matches("[data-alternate]")){
+      if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
         if (!("alternateTimeout" in this.shadowRoot)) return;
 
         window.clearTimeout(this.shadowRoot.alternateTimeout);
@@ -261,7 +263,7 @@ class MenuDropElement extends HTMLElement {
       if (!(event.target instanceof HTMLElement)) return;
       if (event.pointerType == "mouse") return;
 
-      if (event.target.matches(".list")){
+      if (event.target.matches<MenuDropList>(".list")){
         event.target.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
         event.target.focus();
       }
@@ -276,7 +278,7 @@ class MenuDropElement extends HTMLElement {
       }
       delete this.shadowRoot.pointerType;
 
-      if (event.target.matches(".opener") && !this.matches("[data-alternate]")){
+      if (event.target.matches<MenuDropOpener>(".opener") && !this.matches("[data-alternate]")){
         if (event.pointerType == "mouse") return;
 
         if (event.target != this.shadowRoot.activeElement){
@@ -285,7 +287,7 @@ class MenuDropElement extends HTMLElement {
         this.toggle();
       }
 
-      if (event.target.matches(".sub-list > .option")){
+      if (event.target.matches<MenuDropOption>(".sub-list > .option")){
         this[
           (event.pointerType != "mouse")
             ? "open"
@@ -310,7 +312,7 @@ class MenuDropElement extends HTMLElement {
         event.preventDefault();
       }
 
-      if (event.target.matches(".opener") && this.matches("[data-alternate]")){
+      if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
         if (event.target != this.shadowRoot.activeElement){
           event.target.focus();
         }
@@ -318,7 +320,7 @@ class MenuDropElement extends HTMLElement {
       }
     });
 
-    this.shadowRoot.addEventListener("focusout",event => {
+    this.shadowRoot.addEventListener("focusout",() => {
       window.requestAnimationFrame(() => {
         if (document.activeElement == this) return;
         if (this.matches("[data-open]")){
@@ -502,7 +504,7 @@ class MenuDropElement extends HTMLElement {
       )
         .querySelectorAll<MenuDropSubList>(".sub-list[data-open]")!
     )
-      .filter(subList => subList != list.closest(".sub-list"))
+      .filter(subList => subList != list.closest<MenuDropSubList>(".sub-list"))
       .forEach(subList => this.close(subList,false));
 
     list.part.add(
@@ -580,6 +582,9 @@ class MenuDropElement extends HTMLElement {
    * 
    * This text should probably be in the commit message for these docs, too.
    * 
+   * Second edit: Realized there are a few other features that I haven't mentioned anywhere in any documentation either,
+   * that being the Divider element (`<hr>`), and alternate menus for right-click and long-pressing on touch devices.
+   * 
    * ```html
    * <!--
    *   In the top-level opener button, the text content
@@ -629,7 +634,10 @@ class MenuDropElement extends HTMLElement {
   getOptions(container: MenuDropList = this.main): MenuDropOption[] {
     const elements = container.querySelectorAll<MenuDropOption>(":scope > .option, :scope > li > .option, :scope > li > .sub-list > .option")!;
     return Array.from(elements)
-      .filter(element => ((window.getComputedStyle(element).getPropertyValue("display") != "none") && !element.matches("[data-disabled]")));
+      .filter(element => (
+        (window.getComputedStyle(element).getPropertyValue("display") != "none") &&
+        !element.matches("[data-disabled]")
+      ));
   }
 
   /**
@@ -639,7 +647,10 @@ class MenuDropElement extends HTMLElement {
   */
   getVisibility(element: HTMLElement = this.main){
     const bounds = element.getBoundingClientRect();
-    return (bounds.left >= 0 && bounds.right <= window.innerWidth - bounds.width);
+    return (
+      bounds.left >= 0 &&
+      bounds.right <= window.innerWidth - bounds.width
+    );
   }
 
   /**
@@ -647,7 +658,10 @@ class MenuDropElement extends HTMLElement {
   */
   getTextNodes(element: HTMLElement){
     return Array.from(element.childNodes)
-      .filter(node => node.nodeType == Node.TEXT_NODE && node.textContent?.replace(/\s/g,"").length);
+      .filter(node => (
+        node.nodeType == Node.TEXT_NODE &&
+        node.textContent?.replace(/\s/g,"").length
+      ));
   }
 
   override focus(options: FocusOptions = {}){
