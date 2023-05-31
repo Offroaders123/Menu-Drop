@@ -1,4 +1,4 @@
-import type MenuItem from "./menu-item.js";
+import type MenuItem from "./MenuItem.js";
 
 export interface MenuListCloseOptions {
   recursive?: boolean;

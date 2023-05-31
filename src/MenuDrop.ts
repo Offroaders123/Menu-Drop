@@ -1,6 +1,6 @@
-import MenuOpener from "./menu-opener.js";
-import MenuList from "./menu-list.js";
-import MenuItem from "./menu-item.js";
+import MenuOpener from "./MenuOpener.js";
+import MenuList from "./MenuList.js";
+import MenuItem from "./MenuItem.js";
 
 export class MenuDrop extends HTMLElement {
   #pointerType: typeof PointerEvent.prototype.pointerType | null = null;

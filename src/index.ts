@@ -1,9 +1,9 @@
-export * from "./menu-drop.js";
-export * from "./menu-opener.js";
-export * from "./menu-list.js";
-export * from "./menu-item.js";
-export * from "./menu-sub-list.js";
+export * from "./MenuDrop.js";
+export * from "./MenuOpener.js";
+export * from "./MenuList.js";
+export * from "./MenuItem.js";
+export * from "./MenuSubList.js";
 
-import stylesheet from "../style.css" assert { type: "css" };
+import stylesheet from "../styles/style.css" assert { type: "css" };
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets,stylesheet];

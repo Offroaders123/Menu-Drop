@@ -1,5 +1,5 @@
-import type MenuList from "./menu-list.js";
-import type MenuItem from "./menu-item.js";
+import type MenuList from "./MenuList.js";
+import type MenuItem from "./MenuItem.js";
 
 export class MenuSubList extends HTMLElement {
   get opener() {
