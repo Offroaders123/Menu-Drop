@@ -1,16 +1,21 @@
 {
-  "name": "menu-drop",
+  "name": "@stedit/menu-drop",
   "version": "3.0.0",
-  "description": "A simple Web Component that creates fully navigable menu systems using plain HTML!",
+  "description": "A simple menu bar Web Component for the browser!",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "npx tsc -w"
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "new-javascript": "^0.3.1",
+    "typescript": "^5.0.4"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Offroaders123/Menu-Drop-Component.git"
+    "url": "git+https://github.com/Offroaders123/Menu-Drop.git"
   },
   "keywords": [
     "javascript",
@@ -23,7 +28,8 @@
   "author": "Brandon Bennett <offroaders123@gmail.com> (https://github.com/Offroaders123)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Offroaders123/Menu-Drop-Component/issues"
+    "url": "https://github.com/Offroaders123/Menu-Drop/issues"
   },
-  "homepage": "https://github.com/Offroaders123/Menu-Drop-Component#readme"
+  "homepage": "https://github.com/Offroaders123/Menu-Drop#readme",
+  "sideEffects": true
 }

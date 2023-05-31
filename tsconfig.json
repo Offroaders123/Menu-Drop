@@ -4,7 +4,12 @@
     "outDir": "./dist",
     "module": "ESNext",
     "target": "ESNext",
+    "types": [
+      "new-javascript"
+    ],
     "declaration": true,
-    "strict": true
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitOverride": true
   }
 }

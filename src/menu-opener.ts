@@ -11,7 +11,7 @@ export class MenuOpener extends HTMLElement {
     this.shadowRoot.append(this.#button);
   }
 
-  focus(options?: FocusOptions) {
+  override focus(options?: FocusOptions) {
     this.#button.focus(options);
   }
 
