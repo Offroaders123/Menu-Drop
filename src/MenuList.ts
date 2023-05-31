@@ -1,4 +1,6 @@
+import type MenuDrop from "./MenuDrop.js";
 import type MenuItem from "./MenuItem.js";
+import type MenuSubList from "./MenuSubList.js";
 
 export interface MenuListCloseOptions {
   recursive?: boolean;
@@ -11,7 +13,7 @@ export class MenuList extends HTMLElement {
     if (this.isOpen) this.open();
   }
 
-  open() {
+  open(): void {
     if (this.isMainList){
       const { left, bottom } = this.menu!.opener?.getBoundingClientRect() ?? {};
       this.style.left = `${left}px`;
@@ -26,7 +28,8 @@ export class MenuList extends HTMLElement {
     }
   }
 
-  close({ recursive = true }: MenuListCloseOptions = {}) {
+  close(options?: MenuListCloseOptions): void;
+  close({ recursive = true }: MenuListCloseOptions = {}): void {
     if (recursive){
       for (const list of this.lists){
         if (list.isOpen) list.close();
@@ -47,60 +50,60 @@ export class MenuList extends HTMLElement {
     }
   }
 
-  toggle() {
+  toggle(): void {
     this.isOpen ? this.close() : this.open();
   }
 
-  get items() {
+  get items(): MenuItem[] {
     return [...this.querySelectorAll<MenuItem>(":scope > menu-item, :scope > menu-sub-list > menu-item")];
   }
 
-  get lists() {
+  get lists(): MenuList[] {
     return [...this.querySelectorAll<MenuList>(":scope > menu-sub-list > menu-list")];
   }
 
-  get visibility() {
+  get visibility(): boolean {
     const { left, right, width } = this.getBoundingClientRect();
     return (left >= 0 && right <= window.innerWidth - width);
   }
 
-  get isMainList() {
+  get isMainList(): boolean {
     return this.matches<MenuList>("menu-drop > menu-list");
   }
 
-  get menu() {
+  get menu(): MenuDrop | null {
     return this.closest("menu-drop");
   }
 
-  get isOpen() {
+  get isOpen(): boolean {
     return this.matches<MenuList>("[open]");
   }
 
-  get list() {
+  get list(): MenuList {
     return this;
   }
 
-  get currentItem() {
+  get currentItem(): MenuItem {
     return this.items.filter(item => item === document.activeElement)[0];
   }
 
-  get nextItem() {
+  get nextItem(): MenuItem {
     const { currentItem, items } = this;
     const index = currentItem?.index + 1;
     return items[index <= items.length - 1 ? index : 0];
   }
 
-  get previousItem() {
+  get previousItem(): MenuItem {
     const { currentItem, items } = this;
     const index = currentItem?.index - 1;
     return items[index >= 0 ? index : items.length - 1];
   }
 
-  get subList() {
+  get subList(): MenuSubList | null {
     return this.closest("menu-sub-list");
   }
 
-  get isSubList() {
+  get isSubList(): boolean {
     return (this.subList !== null);
   }
 }

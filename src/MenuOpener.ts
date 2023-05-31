@@ -1,3 +1,6 @@
+import type MenuDrop from "./MenuDrop.js";
+import type MenuList from "./MenuList.js";
+
 export class MenuOpener extends HTMLElement {
   #button = document.createElement("button");
 
@@ -11,19 +14,19 @@ export class MenuOpener extends HTMLElement {
     this.shadowRoot.append(this.#button);
   }
 
-  override focus(options?: FocusOptions) {
+  override focus(options?: FocusOptions): void {
     this.#button.focus(options);
   }
 
-  get menu() {
+  get menu(): MenuDrop | null {
     return this.closest("menu-drop");
   }
 
-  get list() {
+  get list(): MenuList | null {
     return this.menu?.list ?? null;
   }
 
-  get button() {
+  get button(): HTMLButtonElement {
     return this.#button;
   }
 }

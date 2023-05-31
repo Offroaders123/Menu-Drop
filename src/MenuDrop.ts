@@ -202,31 +202,31 @@ export class MenuDrop extends HTMLElement {
     });
   }
 
-  open() {
+  open(): void {
     this.list?.open();
   }
 
-  close() {
+  close(): void {
     this.list?.close();
   }
 
-  toggle() {
+  toggle(): void {
     this.list?.toggle();
   }
 
-  get opener() {
+  get opener(): MenuOpener | null {
     return this.querySelector("menu-opener");
   }
 
-  get isOpen() {
+  get isOpen(): boolean {
     return this.list?.isOpen ?? false;
   }
 
-  get list() {
+  get list(): MenuList | null {
     return this.querySelector<MenuList>(":scope > menu-list");
   }
 
-  get lists() {
+  get lists(): MenuList[] {
     return [...this.querySelectorAll<MenuList>(":scope > menu-list")];
   }
 }

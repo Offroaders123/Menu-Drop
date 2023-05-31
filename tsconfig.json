@@ -5,9 +5,6 @@
     "module": "ESNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "types": [
-      "new-javascript"
-    ],
     "declaration": true,
     "sourceMap": true,
     "strict": true,

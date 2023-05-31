@@ -2,11 +2,11 @@ import type MenuList from "./MenuList.js";
 import type MenuItem from "./MenuItem.js";
 
 export class MenuSubList extends HTMLElement {
-  get opener() {
+  get opener(): MenuItem | null {
     return this.querySelector<MenuItem>(":scope > menu-item");
   }
 
-  get list() {
+  get list(): MenuList | null {
     return this.querySelector<MenuList>(":scope > menu-list");
   }
 }

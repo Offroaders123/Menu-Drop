@@ -1,18 +1,21 @@
+import type MenuList from "./MenuList.js";
+import type MenuSubList from "./MenuSubList.js";
+
 export class MenuItem extends HTMLElement {
   constructor() {
     super();
     this.tabIndex = -1;
   }
 
-  get list() {
+  get list(): MenuList | null {
     return this.closest("menu-list");
   }
 
-  get index() {
+  get index(): number {
     return this.list?.items.indexOf(this) ?? 0;
   }
 
-  get subList() {
+  get subList(): MenuSubList | null {
     return this.closest("menu-sub-list");
   }
 }
