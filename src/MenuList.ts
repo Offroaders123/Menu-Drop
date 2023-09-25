@@ -83,20 +83,24 @@ export class MenuList extends HTMLElement {
     return this;
   }
 
-  get currentItem(): MenuItem {
-    return this.items.filter(item => item === document.activeElement)[0];
+  get currentItem(): MenuItem | null {
+    return this.items.find(item => item === document.activeElement) ?? null;
   }
 
-  get nextItem(): MenuItem {
+  get nextItem(): MenuItem | null {
     const { currentItem, items } = this;
-    const index = currentItem?.index + 1;
-    return items[index <= items.length - 1 ? index : 0];
+    if (currentItem === null) return null;
+
+    const index = currentItem.index + 1;
+    return items[index <= items.length - 1 ? index : 0] ?? null;
   }
 
-  get previousItem(): MenuItem {
+  get previousItem(): MenuItem | null {
     const { currentItem, items } = this;
-    const index = currentItem?.index - 1;
-    return items[index >= 0 ? index : items.length - 1];
+    if (currentItem === null) return null;
+
+    const index = currentItem.index - 1;
+    return items[index >= 0 ? index : items.length - 1] ?? null;
   }
 
   get subList(): MenuSubList | null {

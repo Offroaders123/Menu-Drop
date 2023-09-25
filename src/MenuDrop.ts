@@ -16,7 +16,7 @@ export class MenuDrop extends HTMLElement {
         event.preventDefault();
 
         if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
-          event.target.list?.nextItem.focus();
+          event.target.list?.nextItem?.focus();
         }
       }
 
@@ -25,7 +25,7 @@ export class MenuDrop extends HTMLElement {
         event.preventDefault();
 
         if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
-          event.target.list?.previousItem.focus();
+          event.target.list?.previousItem?.focus();
         }
       }
 
@@ -34,7 +34,7 @@ export class MenuDrop extends HTMLElement {
         event.preventDefault();
 
         if (event.target.matches("menu-list")){
-          event.target.items[0].focus();
+          event.target.items[0]?.focus();
         }
       }
 
@@ -43,7 +43,7 @@ export class MenuDrop extends HTMLElement {
 
         if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
           event.target.subList?.list?.open();
-          event.target.subList?.list?.items[0].focus();
+          event.target.subList?.list?.items[0]?.focus();
         }
       }
 
@@ -86,7 +86,7 @@ export class MenuDrop extends HTMLElement {
         }
 
         if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
-          event.target.subList?.list?.items[0].focus();
+          event.target.subList?.list?.items[0]?.focus();
         }
       }
     });
@@ -103,7 +103,7 @@ export class MenuDrop extends HTMLElement {
         }
 
         if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
-          event.target.subList?.list?.items[0].focus();
+          event.target.subList?.list?.items[0]?.focus();
         }
       }
     });
