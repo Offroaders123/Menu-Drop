@@ -1,7 +1,11 @@
 import type MenuList from "./MenuList.js";
 import type MenuSubList from "./MenuSubList.js";
 
-export class MenuItem extends HTMLElement {
+export interface MenuItemLike extends HTMLElement {
+  readonly list: MenuList | null;
+}
+
+export class MenuItem extends HTMLElement implements MenuItemLike {
   constructor() {
     super();
     this.tabIndex = -1;

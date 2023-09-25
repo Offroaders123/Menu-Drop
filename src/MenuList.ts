@@ -1,12 +1,12 @@
 import type MenuDrop from "./MenuDrop.js";
-import type MenuItem from "./MenuItem.js";
+import type { MenuItem, MenuItemLike } from "./MenuItem.js";
 import type MenuSubList from "./MenuSubList.js";
 
 export interface MenuListCloseOptions {
   recursive?: boolean;
 }
 
-export class MenuList extends HTMLElement {
+export class MenuList extends HTMLElement implements MenuItemLike {
   constructor() {
     super();
     this.tabIndex = -1;

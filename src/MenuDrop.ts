@@ -2,6 +2,8 @@ import MenuOpener from "./MenuOpener.js";
 import MenuList from "./MenuList.js";
 import MenuItem from "./MenuItem.js";
 
+import type { MenuItemLike } from "./MenuItem.js";
+
 export class MenuDrop extends HTMLElement {
   #pointerType: typeof PointerEvent.prototype.pointerType | null = null;
 
@@ -15,7 +17,7 @@ export class MenuDrop extends HTMLElement {
         if (!this.isOpen) return;
         event.preventDefault();
 
-        if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
+        if (event.target.matches<MenuItemLike>("menu-opener, menu-list, menu-item")){
           event.target.list?.nextItem?.focus();
         }
       }
@@ -24,7 +26,7 @@ export class MenuDrop extends HTMLElement {
         if (!this.isOpen) return;
         event.preventDefault();
 
-        if (event.target.matches<MenuOpener | MenuList | MenuItem>("menu-opener, menu-list, menu-item")){
+        if (event.target.matches<MenuItemLike>("menu-opener, menu-list, menu-item")){
           event.target.list?.previousItem?.focus();
         }
       }

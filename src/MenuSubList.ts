@@ -1,7 +1,7 @@
 import type MenuList from "./MenuList.js";
-import type MenuItem from "./MenuItem.js";
+import type { MenuItem, MenuItemLike } from "./MenuItem.js";
 
-export class MenuSubList extends HTMLElement {
+export class MenuSubList extends HTMLElement implements MenuItemLike {
   get opener(): MenuItem | null {
     return this.querySelector<MenuItem>(":scope > menu-item");
   }
