@@ -5,6 +5,13 @@ declare global {
     matches(selectors: string): boolean;
     matches<E extends Element = Element>(selectors: string): this is E;
   }
+
+  interface MouseEvent {
+    /**
+     * @deprecated
+    */
+    pointerType?: PointerEvent["pointerType"];
+  }
 }
 
 export {};

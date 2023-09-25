@@ -3,7 +3,7 @@ import MenuList from "./MenuList.js";
 import MenuItem from "./MenuItem.js";
 
 export class MenuDrop extends HTMLElement {
-  #pointerType: typeof PointerEvent.prototype.pointerType | null = null;
+  #pointerType: MouseEvent["pointerType"];
 
   constructor() {
     super();
@@ -74,7 +74,9 @@ export class MenuDrop extends HTMLElement {
       }
 
       if (event.key === "Tab"){
-        if (this.isOpen) event.preventDefault();
+        if (this.isOpen){
+          event.preventDefault();
+        }
       }
 
       if (event.key === "Enter"){
@@ -123,15 +125,21 @@ export class MenuDrop extends HTMLElement {
         }
 
         if (event.target.matches("menu-opener")){
-          if (event.target !== document.activeElement) event.target.button?.focus();
-          if (event.button === 0) this.toggle();
+          if (event.target !== document.activeElement){
+            event.target.button?.focus();
+          }
+          if (event.button === 0){
+            this.toggle();
+          }
         }
 
         if (event.target.matches("menu-list")){
           event.target.focus();
 
           for (const list of event.target.lists){
-            if (list.isOpen) list.close();
+            if (list.isOpen){
+              list.close();
+            }
           }
         }
       }
@@ -141,12 +149,18 @@ export class MenuDrop extends HTMLElement {
       if (!(event.target instanceof Element)) return;
 
       if (event.pointerType === "mouse" && event.target !== document.activeElement){
-        if (event.target.matches("menu-item")) event.target.focus();
-        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")) event.target.subList?.list?.open();
+        if (event.target.matches("menu-item")){
+          event.target.focus();
+        }
+        if (event.target.matches<MenuItem>("menu-sub-list > menu-item")){
+          event.target.subList?.list?.open();
+        }
 
         if (event.target.matches<MenuItem>(":not(menu-sub-list) > menu-item")){
           for (const list of event.target.list?.lists ?? []){
-            if (list.isOpen) list.close();
+            if (list.isOpen){
+              list.close();
+            }
           }
         }
       }
@@ -160,7 +174,9 @@ export class MenuDrop extends HTMLElement {
         event.target.focus();
 
         for (const list of event.target.lists){
-          if (list.isOpen) list.close();
+          if (list.isOpen){
+            list.close();
+          }
         }
       }
     });
@@ -169,13 +185,15 @@ export class MenuDrop extends HTMLElement {
       if (!(event.target instanceof Element)) return;
 
       // See the pointerdown event for more info :O
-      // @ts-ignore
-      if (!("pointerType" in event)) event.pointerType = this.#pointerType;
-      this.#pointerType = null;
+      if (event.pointerType === undefined){
+        event.pointerType = this.#pointerType;
+      }
+      this.#pointerType = undefined;
 
-      // @ts-ignore
       if (event.target.matches("menu-opener") && event.pointerType !== "mouse"){
-        if (event.target !== document.activeElement) event.target.focus();
+        if (event.target !== document.activeElement){
+          event.target.focus();
+        }
         this.toggle();
       }
 
@@ -195,10 +213,12 @@ export class MenuDrop extends HTMLElement {
     });
 
     this.addEventListener("focusout",async () => {
-      await new Promise(resolve => window.requestAnimationFrame(resolve));
+      await new Promise<number>(resolve => requestAnimationFrame(resolve));
       if (this.contains(document.activeElement)) return;
 
-      if (this.isOpen) this.close();
+      if (this.isOpen){
+        this.close();
+      }
     });
   }
 
@@ -231,7 +251,7 @@ export class MenuDrop extends HTMLElement {
   }
 }
 
-window.customElements.define("menu-drop",MenuDrop);
+customElements.define("menu-drop",MenuDrop);
 
 declare global {
   interface HTMLElementTagNameMap {

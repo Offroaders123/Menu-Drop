@@ -2,10 +2,7 @@ import type MenuList from "./MenuList.js";
 import type MenuSubList from "./MenuSubList.js";
 
 export class MenuItem extends HTMLElement {
-  constructor() {
-    super();
-    this.tabIndex = -1;
-  }
+  override tabIndex = -1;
 
   get list(): MenuList | null {
     return this.closest("menu-list");
@@ -20,7 +17,7 @@ export class MenuItem extends HTMLElement {
   }
 }
 
-window.customElements.define("menu-item",MenuItem);
+customElements.define("menu-item",MenuItem);
 
 declare global {
   interface HTMLElementTagNameMap {

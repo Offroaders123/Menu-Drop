@@ -7,17 +7,21 @@ export interface MenuListCloseOptions {
 }
 
 export class MenuList extends HTMLElement {
+  override tabIndex = -1;
+
   constructor() {
     super();
-    this.tabIndex = -1;
-    if (this.isOpen) this.open();
+
+    if (this.isOpen){
+      this.open();
+    }
   }
 
   open(): void {
     if (this.isMainList){
-      const { left, bottom } = this.menu!.opener?.getBoundingClientRect() ?? {};
-      this.style.left = `${left}px`;
-      this.style.top = `${bottom}px`;
+      const { left, bottom } = this.menu!.opener?.getBoundingClientRect() ?? new DOMRect();
+      this.style.left = `${left satisfies number}px`;
+      this.style.top = `${bottom satisfies number}px`;
       this.menu!.setAttribute("open","");
     }
 
@@ -108,11 +112,11 @@ export class MenuList extends HTMLElement {
   }
 
   get isSubList(): boolean {
-    return (this.subList !== null);
+    return this.subList !== null;
   }
 }
 
-window.customElements.define("menu-list",MenuList);
+customElements.define("menu-list",MenuList);
 
 declare global {
   interface HTMLElementTagNameMap {
