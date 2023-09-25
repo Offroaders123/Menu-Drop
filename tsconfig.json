@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
+    "allowArbitraryExtensions": true,
     "noEmit": true,
     "strict": true,
     "noImplicitOverride": true
