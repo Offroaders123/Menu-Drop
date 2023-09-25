@@ -1,8 +1,7 @@
 import type MenuDrop from "./MenuDrop.js";
 import type MenuList from "./MenuList.js";
-import type { MenuItemLike } from "./MenuItem.js";
 
-export class MenuOpener extends HTMLElement implements MenuItemLike {
+export class MenuOpener extends HTMLElement {
   #button = document.createElement("button");
 
   declare readonly shadowRoot: ShadowRoot;
