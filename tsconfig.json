@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
     "module": "NodeNext",
     "target": "ESNext",
-    "declaration": true,
-    "sourceMap": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "strict": true,
     "noImplicitOverride": true
   }
