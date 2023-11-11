@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
     "allowArbitraryExtensions": true,
+    "types": [
+      "vite/client"
+    ],
     "noEmit": true,
+    "skipLibCheck": true,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -14,5 +16,8 @@
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true
-  }
+  },
+  "exclude": [
+    "./dist"
+  ]
 }

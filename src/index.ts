@@ -4,7 +4,7 @@ export * from "./MenuList.js";
 export * from "./MenuItem.js";
 export * from "./MenuSubList.js";
 
-import styles from "../styles/style.css" assert { type: "css" };
+import styles from "../styles/style.css?inline" assert { type: "css" };
 
 const stylesheet: CSSStyleSheet = typeof styles === "string"
   ? await new CSSStyleSheet().replace(styles)
