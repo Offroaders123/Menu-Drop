@@ -7,8 +7,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc --project ./tsconfig.build.json",
-    "dev": "tsc --watch",
-    "serve": "vite"
+    "dev": "vite ./test"
   },
   "repository": {
     "type": "git",

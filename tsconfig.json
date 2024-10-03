@@ -15,9 +15,7 @@
     "noUncheckedIndexedAccess": true,
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
+    "allowUnusedLabels": false,
     "noUnusedParameters": true
-  },
-  "exclude": [
-    "./dist"
-  ]
+  }
 }
