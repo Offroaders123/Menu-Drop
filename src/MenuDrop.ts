@@ -1,6 +1,6 @@
-import MenuOpener from "./MenuOpener.js";
-import MenuList from "./MenuList.js";
-import MenuItem from "./MenuItem.js";
+import type { MenuOpener } from "./MenuOpener.js";
+import type { MenuList } from "./MenuList.js";
+import type { MenuItem } from "./MenuItem.js";
 
 export class MenuDrop extends HTMLElement {
   #pointerType: MouseEvent["pointerType"];
@@ -258,5 +258,3 @@ declare global {
     "menu-drop": MenuDrop;
   }
 }
-
-export default MenuDrop;

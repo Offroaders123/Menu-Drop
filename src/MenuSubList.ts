@@ -1,5 +1,5 @@
-import type MenuList from "./MenuList.js";
-import type MenuItem from "./MenuItem.js";
+import type { MenuList } from "./MenuList.js";
+import type { MenuItem } from "./MenuItem.js";
 
 export class MenuSubList extends HTMLElement {
   get opener(): MenuItem | null {
@@ -18,5 +18,3 @@ declare global {
     "menu-sub-list": MenuSubList;
   }
 }
-
-export default MenuSubList;

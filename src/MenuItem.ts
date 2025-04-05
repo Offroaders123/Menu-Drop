@@ -1,5 +1,5 @@
-import type MenuList from "./MenuList.js";
-import type MenuSubList from "./MenuSubList.js";
+import type { MenuList } from "./MenuList.js";
+import type { MenuSubList } from "./MenuSubList.js";
 
 export class MenuItem extends HTMLElement {
   override tabIndex = -1;
@@ -24,5 +24,3 @@ declare global {
     "menu-item": MenuItem;
   }
 }
-
-export default MenuItem;

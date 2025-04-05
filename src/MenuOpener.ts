@@ -1,5 +1,5 @@
-import type MenuDrop from "./MenuDrop.js";
-import type MenuList from "./MenuList.js";
+import type { MenuDrop } from "./MenuDrop.js";
+import type { MenuList } from "./MenuList.js";
 
 export class MenuOpener extends HTMLElement {
   #button = document.createElement("button");
@@ -38,5 +38,3 @@ declare global {
     "menu-opener": MenuOpener;
   }
 }
-
-export default MenuOpener;

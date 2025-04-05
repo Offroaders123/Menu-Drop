@@ -1,6 +1,6 @@
-import type MenuDrop from "./MenuDrop.js";
-import type MenuItem from "./MenuItem.js";
-import type MenuSubList from "./MenuSubList.js";
+import type { MenuDrop } from "./MenuDrop.js";
+import type { MenuItem } from "./MenuItem.js";
+import type { MenuSubList } from "./MenuSubList.js";
 
 export interface MenuListCloseOptions {
   recursive?: boolean;
@@ -123,5 +123,3 @@ declare global {
     "menu-list": MenuList;
   }
 }
-
-export default MenuList;
