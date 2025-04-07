@@ -2,7 +2,7 @@ import type { MenuList } from "./MenuList.js";
 import type { MenuSubList } from "./MenuSubList.js";
 
 export class MenuItem extends HTMLElement {
-  override tabIndex = -1;
+  override tabIndex: number = -1;
 
   get list(): MenuList | null {
     return this.closest("menu-list");

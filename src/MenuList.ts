@@ -7,7 +7,7 @@ export interface MenuListCloseOptions {
 }
 
 export class MenuList extends HTMLElement {
-  override tabIndex = -1;
+  override tabIndex: number = -1;
 
   constructor() {
     super();
@@ -95,7 +95,7 @@ export class MenuList extends HTMLElement {
     const { currentItem, items } = this;
     if (currentItem === null) return null;
 
-    const index = currentItem.index + 1;
+    const index: number = currentItem.index + 1;
     return items[index <= items.length - 1 ? index : 0] ?? null;
   }
 
@@ -103,7 +103,7 @@ export class MenuList extends HTMLElement {
     const { currentItem, items } = this;
     if (currentItem === null) return null;
 
-    const index = currentItem.index - 1;
+    const index: number = currentItem.index - 1;
     return items[index >= 0 ? index : items.length - 1] ?? null;
   }
 
