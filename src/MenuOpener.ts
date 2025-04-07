@@ -9,7 +9,7 @@ export class MenuOpener extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open", delegatesFocus: true });
-    
+
     this.#button.append(document.createElement("slot"));
     this.shadowRoot.append(this.#button);
   }
@@ -31,7 +31,7 @@ export class MenuOpener extends HTMLElement {
   }
 }
 
-customElements.define("menu-opener",MenuOpener);
+customElements.define("menu-opener", MenuOpener);
 
 declare global {
   interface HTMLElementTagNameMap {

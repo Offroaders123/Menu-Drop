@@ -11,7 +11,7 @@ export class MenuSubList extends HTMLElement {
   }
 }
 
-customElements.define("menu-sub-list",MenuSubList);
+customElements.define("menu-sub-list", MenuSubList);
 
 declare global {
   interface HTMLElementTagNameMap {

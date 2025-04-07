@@ -17,7 +17,7 @@ export class MenuItem extends HTMLElement {
   }
 }
 
-customElements.define("menu-item",MenuItem);
+customElements.define("menu-item", MenuItem);
 
 declare global {
   interface HTMLElementTagNameMap {

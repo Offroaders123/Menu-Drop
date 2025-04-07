@@ -12,30 +12,30 @@ export class MenuList extends HTMLElement {
   constructor() {
     super();
 
-    if (this.isOpen){
+    if (this.isOpen) {
       this.open();
     }
   }
 
   open(): void {
-    if (this.isMainList){
+    if (this.isMainList) {
       const { left, bottom } = this.menu!.opener?.getBoundingClientRect() ?? new DOMRect();
       this.style.left = `${left satisfies number}px`;
       this.style.top = `${bottom satisfies number}px`;
-      this.menu!.setAttribute("open","");
+      this.menu!.setAttribute("open", "");
     }
 
-    this.setAttribute("open","");
+    this.setAttribute("open", "");
 
-    if (this.isSubList){
-      this.subList!.setAttribute("open","");
+    if (this.isSubList) {
+      this.subList!.setAttribute("open", "");
     }
   }
 
   close(options?: MenuListCloseOptions): void;
   close({ recursive = true }: MenuListCloseOptions = {}): void {
-    if (recursive){
-      for (const list of this.lists){
+    if (recursive) {
+      for (const list of this.lists) {
         if (list.isOpen) list.close();
       }
     }
@@ -44,12 +44,12 @@ export class MenuList extends HTMLElement {
 
     this.removeAttribute("open");
 
-    if (this.isMainList){
+    if (this.isMainList) {
       this.removeAttribute("style");
       this.menu!.removeAttribute("open");
     }
 
-    if (this.isSubList){
+    if (this.isSubList) {
       this.subList!.removeAttribute("open");
     }
   }
@@ -116,7 +116,7 @@ export class MenuList extends HTMLElement {
   }
 }
 
-customElements.define("menu-list",MenuList);
+customElements.define("menu-list", MenuList);
 
 declare global {
   interface HTMLElementTagNameMap {
