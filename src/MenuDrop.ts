@@ -117,9 +117,13 @@ export class MenuDrop extends HTMLElement {
       // click events for browsers that don't provide the value there.
       // All browsers support it in Pointer Events, so I just save the
       // value as a property on the element while the event takes place.
+      //
+      // Okay, things have gotten worse, it looks like Safari allows for "touch"
+      // as a type on real PointerEvent objects, but for MouseEvent,
+      // it incorrectly shows it always as "mouse". Ugh.
       this.#pointerType = event.pointerType;
 
-      if (event.pointerType === "mouse") {
+      if (this.#pointerType === "mouse") {
         if (event.button !== 0 || event.target.matches<MenuOpener | MenuList>("menu-opener, menu-list")) {
           event.preventDefault();
         }
@@ -148,7 +152,7 @@ export class MenuDrop extends HTMLElement {
     this.addEventListener("pointermove", event => {
       if (!(event.target instanceof Element)) return;
 
-      if (event.pointerType === "mouse" && event.target !== document.activeElement) {
+      if (this.#pointerType === "mouse" && event.target !== document.activeElement) {
         if (event.target.matches("menu-item")) {
           event.target.focus();
         }
@@ -168,7 +172,7 @@ export class MenuDrop extends HTMLElement {
 
     this.addEventListener("pointerup", event => {
       if (!(event.target instanceof HTMLElement)) return;
-      if (event.pointerType === "mouse") return;
+      if (this.#pointerType === "mouse") return;
 
       if (event.target.matches("menu-list")) {
         event.target.focus();
@@ -184,13 +188,13 @@ export class MenuDrop extends HTMLElement {
     this.addEventListener("click", event => {
       if (!(event.target instanceof Element)) return;
 
-      // See the pointerdown event for more info :O
-      if (event.pointerType === undefined) {
-        event.pointerType = this.#pointerType;
-      }
-      this.#pointerType = undefined;
+      // // See the pointerdown event for more info :O
+      // if (event.pointerType === undefined) {
+      //   event.pointerType = this.#pointerType;
+      // }
+      // this.#pointerType = undefined;
 
-      if (event.target.matches("menu-opener") && event.pointerType !== "mouse") {
+      if (event.target.matches("menu-opener") && this.#pointerType !== "mouse") {
         if (event.target !== document.activeElement) {
           event.target.focus();
         }

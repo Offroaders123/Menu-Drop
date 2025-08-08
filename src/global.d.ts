@@ -8,7 +8,7 @@ declare global {
 
   interface MouseEvent {
     /**
-     * @deprecated
+     * @deprecated Not so fast there bucko! This appears to be supported in Safari now*, hence why it's usage is broken on touch devices. Well, it's broken, this is uglier.
     */
     pointerType?: PointerEvent["pointerType"];
   }
