@@ -187,7 +187,7 @@ class MenuDropElement extends HTMLElement {
 
       this.shadowRoot.pointerType = event.pointerType;
 
-      if (event.pointerType != "mouse"){
+      if (this.shadowRoot.pointerType != "mouse"){
         if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
           this.shadowRoot.alternateTimeout = window.setTimeout(() => {
             if (event.target != this.shadowRoot.activeElement){
@@ -198,7 +198,7 @@ class MenuDropElement extends HTMLElement {
         }
       }
 
-      if (event.pointerType == "mouse"){
+      if (this.shadowRoot.pointerType == "mouse"){
         if ((event.button != 0 && !event.target.matches("a")) || event.target.matches<MenuDropOpener | MenuDropList>(".opener, .list")){
           event.preventDefault();
         }
@@ -223,7 +223,7 @@ class MenuDropElement extends HTMLElement {
     this.shadowRoot.addEventListener("pointermove",event => {
       if (!(event.target instanceof HTMLElement)) return;
 
-      if (event.pointerType != "mouse"){
+      if (this.shadowRoot.pointerType != "mouse"){
         if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
           if (!("alternateTimeout" in this.shadowRoot)) return;
           window.clearTimeout(this.shadowRoot.alternateTimeout);
@@ -231,7 +231,7 @@ class MenuDropElement extends HTMLElement {
         }
       }
 
-      if (event.pointerType == "mouse"){
+      if (this.shadowRoot.pointerType == "mouse"){
         if (event.target == this.shadowRoot.activeElement) return;
         if (event.target.matches<MenuDropOption>(".option")){
           event.target.focus();
@@ -249,7 +249,7 @@ class MenuDropElement extends HTMLElement {
 
     this.shadowRoot.addEventListener("pointerout",event => {
       if (!(event.target instanceof HTMLElement)) return;
-      if (event.pointerType == "mouse") return;
+      if (this.shadowRoot.pointerType == "mouse") return;
 
       if (event.target.matches<MenuDropOpener>(".opener") && this.matches("[data-alternate]")){
         if (!("alternateTimeout" in this.shadowRoot)) return;
@@ -261,7 +261,7 @@ class MenuDropElement extends HTMLElement {
 
     this.shadowRoot.addEventListener("pointerup",event => {
       if (!(event.target instanceof HTMLElement)) return;
-      if (event.pointerType == "mouse") return;
+      if (this.shadowRoot.pointerType == "mouse") return;
 
       if (event.target.matches<MenuDropList>(".list")){
         event.target.querySelectorAll<MenuDropSubList>(":scope > li > .sub-list[data-open]").forEach(subList => this.close(subList));
@@ -273,13 +273,13 @@ class MenuDropElement extends HTMLElement {
       let event = eventOld as MouseEvent & { pointerType?: typeof PointerEvent.prototype.pointerType; };
       if (!(event.target instanceof HTMLElement)) return;
 
-      if (!("pointerType" in event)){
-        event.pointerType = this.shadowRoot.pointerType;
-      }
-      delete this.shadowRoot.pointerType;
+      // if (!("pointerType" in event)){
+      //   event.pointerType = this.shadowRoot.pointerType;
+      // }
+      // delete this.shadowRoot.pointerType;
 
       if (event.target.matches<MenuDropOpener>(".opener") && !this.matches("[data-alternate]")){
-        if (event.pointerType == "mouse") return;
+        if (this.shadowRoot.pointerType == "mouse") return;
 
         if (event.target != this.shadowRoot.activeElement){
           event.target.focus();
@@ -289,7 +289,7 @@ class MenuDropElement extends HTMLElement {
 
       if (event.target.matches<MenuDropOption>(".sub-list > .option")){
         this[
-          (event.pointerType != "mouse")
+          (this.shadowRoot.pointerType != "mouse")
             ? "open"
             : "toggle"
           ](event.target.closest<MenuDropSubList>(".sub-list")!);
